@@ -54,7 +54,7 @@ function PluginRow({ plugin, onSettings }: { plugin: FrontendPlugin; onSettings:
 	const { info } = plugin;
 	const name = info.manifest?.name ?? info.id;
 	return <div className="border-t border-border/60 pt-3" data-testid={`plugin-${info.id}`}>
-		<SettingsRow label={name} hint={[info.origin === "community" ? info.manifest?.version : undefined, plugin.busy ? "Saving…" : plugin.error ? "Error" : plugin.phase === "loading" ? "Loading…" : info.enabled ? "Enabled" : "Disabled"].filter(Boolean).join(" · ")}>
+		<SettingsRow label={name} hint={[info.origin === "community" ? info.manifest?.version : undefined, plugin.busy ? "正在保存…" : plugin.error ? "出错" : plugin.phase === "loading" ? "正在加载…" : info.enabled ? "已启用" : "已禁用"].filter(Boolean).join(" · ")}>
 			<div className="flex shrink-0 items-center gap-2">
 				{info.enabled && <button type="button" aria-label={`${name} 设置`} title={`${name} 设置`}
 					className="flex size-7 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
