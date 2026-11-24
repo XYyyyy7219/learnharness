@@ -2,6 +2,7 @@ import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { normalizeContext, type AssistantMessage, type Model } from "@earendil-works/pi-ai";
 import { Type } from "typebox";
+import { ProxyAgent } from "undici";
 import * as fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -90,6 +91,40 @@ test("alias resolves only OAuth; native Responses body is stateless/namespaced, 
 	assert(replay.some((item: any) => item.encrypted_content === "scratch-encrypted-reasoning"));
 	assert(replay.some((item: any) => item.type === "function_call" && item.id === "fc_scratch" && item.namespace === "learnharness"));
 	assert(replay.some((item: any) => item.type === "function_call_output" && item.call_id === "call_scratch"));
+});
+
+test("desktop ChatGPT uses the first Windows route and does not retry", async () => {
+	const originalRoute = process.env.LH_CHATGPT_WINDOWS_PROXY;
+	const originalFetch = globalThis.fetch;
+	const observed: Array<{ dispatcher?: unknown; redirect?: RequestRedirect } | undefined> = [];
+	globalThis.fetch = (input, init) => {
+		observed.push(init);
+		return originalFetch(input, init);
+	};
+	const engine = piEngineForSpec({ provider: "chatgpt", id: model.id }, false);
+	responseEvents = [complete()];
+	try {
+		process.env.LH_CHATGPT_WINDOWS_PROXY = "PROXY 127.0.0.1:47879; DIRECT";
+		assert.notEqual((await engine.streamFn(engine.model, context(), {}).result()).stopReason, "error");
+		assert.equal(observed.length, 1);
+		assert.ok(observed[0]?.dispatcher instanceof ProxyAgent);
+		assert.equal(observed[0]?.redirect, "error");
+
+		process.env.LH_CHATGPT_WINDOWS_PROXY = "DIRECT";
+		assert.notEqual((await engine.streamFn(engine.model, context(), {}).result()).stopReason, "error");
+		assert.equal(observed.length, 2);
+		assert.equal(observed[1]?.dispatcher, undefined);
+
+		process.env.LH_CHATGPT_WINDOWS_PROXY = "SOCKS5 127.0.0.1:47879; DIRECT";
+		const refused = await engine.streamFn(engine.model, context(), {}).result();
+		assert.equal(refused.stopReason, "error");
+		assert.match(refused.errorMessage ?? "", /代理类型不支持/);
+		assert.equal(observed.length, 2);
+	} finally {
+		globalThis.fetch = originalFetch;
+		if (originalRoute === undefined) delete process.env.LH_CHATGPT_WINDOWS_PROXY;
+		else process.env.LH_CHATGPT_WINDOWS_PROXY = originalRoute;
+	}
 });
 
 test("mixed history never blanket-relabels API providers or reuses foreign reasoning signatures", () => {

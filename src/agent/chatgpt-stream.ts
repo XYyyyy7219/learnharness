@@ -1,5 +1,6 @@
 import type { Api, AssistantMessage, Model, SimpleStreamOptions, StreamFunction, TranscriptContext } from "@earendil-works/pi-ai";
 import { streamSimple } from "@earendil-works/pi-ai/api/openai-responses";
+import { ProxyAgent } from "undici";
 import { AssistantMessageEventStream } from "@earendil-works/pi-ai/utils/event-stream";
 import { transformMessages } from "@earendil-works/pi-ai/api/transform-messages";
 import { chatGPTAbortController, chatGPTScope, chatGPTScopeCurrent, chatGPTLease, chatGPTDenial } from "./chatgpt-bridge.ts";
@@ -7,6 +8,20 @@ import type { AdmissionScope, ChatGPTDispatchLifecycle } from "./chatgpt-request
 import { capturePreparedBackgroundPayload } from "./background-capture.ts";
 
 const USAGE = "https://chatgpt.com/settings/usage";
+let windowsProxyAgent: ProxyAgent | undefined;
+
+function chatGPTResponseFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+	const route = process.env.LH_CHATGPT_WINDOWS_PROXY?.split(";", 1)[0]?.trim();
+	if (process.env.LH_DESKTOP_SERVER !== "1" || !route || route === "DIRECT") {
+		return globalThis.fetch(input, init);
+	}
+	const match = /^(PROXY|HTTPS)\s+([^\s/?#@\\]+)$/.exec(route);
+	if (!match) throw new Error("Unsupported Windows proxy for ChatGPT");
+	const protocol = match[1] === "HTTPS" ? "https" : "http";
+	windowsProxyAgent ??= new ProxyAgent(protocol + "://" + match[2]);
+	const options: RequestInit & { dispatcher: ProxyAgent } = { ...init, dispatcher: windowsProxyAgent, redirect: "error" };
+	return globalThis.fetch(input, options);
+}
 export function chatGPTStreamError(message: string): string {
 	if (/subscription_sharing_usage_limit_exceeded|quota|429/.test(message)) return `ChatGPT plan usage limit reached. Manage usage at ${USAGE}. No API-key fallback was used.`;
 	if (/scope|authorization_context|permission|套餐权限/.test(message)) return "ChatGPT plan permission is missing. Reconnect in Providers and authorize plan use. No API-key fallback was used.";
@@ -16,6 +31,8 @@ export function chatGPTStreamError(message: string): string {
 	if (/cancel|abort|closed|disconnect|已取消|已断开/i.test(message)) return "ChatGPT request cancelled or connection closed. No API-key fallback was used.";
 	if (/catalog|model|模型目录/.test(message)) return "The selected model is unavailable for this ChatGPT account. Refresh Providers and explicitly choose an available model. No API-key fallback was used.";
 	if (/incomplete|terminal|interrupted|stop reason/.test(message)) return "ChatGPT returned an incomplete response. Retry when ready; no API-key fallback was used.";
+	if (/unsupported windows proxy/i.test(message)) return "当前 Windows 代理类型不支持 ChatGPT 聊天。请检查系统 HTTP(S) 代理设置。";
+	if (/connection error|fetch failed|network|timed? ?out|timeout|proxy/i.test(message)) return "无法连接 ChatGPT。请检查网络和系统代理设置，然后重试。";
 	return "ChatGPT request failed. Check your connection and ChatGPT usage, then retry. No API-key fallback was used.";
 }
 
@@ -68,7 +85,7 @@ export function chatGPTStream(background: () => boolean, lifecycle?: ChatGPTDisp
 				check();
 				// NEVER dispatch through Models under openai: that would expose ambient API-key fallback.
 				const transport: Model<"openai-responses"> = { ...logicalModel, api: "openai-responses", provider: "openai", baseUrl: "https://api.openai.com/v1", headers: undefined, samplingParams: undefined, compat: { ...logicalModel.compat, supportsDeveloperRole: true } };
-				const delegate = options?.fetch ?? globalThis.fetch;
+				const delegate = options?.fetch ?? chatGPTResponseFetch;
 				const source = streamSimple(transport, chatGPTHistory(context, logicalModel), {
 					...options,
 					apiKey: credentials.accessToken,

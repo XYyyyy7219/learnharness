@@ -211,7 +211,11 @@ function log(line) {
 	}
 }
 
-function startServer(port) {
+async function startServer(port) {
+	// Use the same Windows routing decision as OAuth and model discovery.
+	const chatGPTSystemProxy = process.platform === "win32"
+		? await session.defaultSession.resolveProxy("https://api.openai.com/v1/responses").catch(() => "")
+		: "";
 	return new Promise((resolve, reject) => {
 		const child = spawn(
 			process.execPath,
@@ -234,6 +238,7 @@ function startServer(port) {
 					// settings-page key change until restart; env wins over file).
 					LH_AUTH_FILE: AUTH_FILE(),
 					LH_DESKTOP_SERVER: "1",
+				LH_CHATGPT_WINDOWS_PROXY: chatGPTSystemProxy,
 					LH_DESKTOP_API_SECRET: desktopAPISecret,
 				},
 				stdio: ["ignore", "pipe", "pipe", "ipc"],
