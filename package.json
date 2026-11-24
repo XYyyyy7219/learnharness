@@ -13,7 +13,9 @@
 	"private": true,
 	"main": "electron/main.cjs",
 	"scripts": {
+		"predev": "node scripts/patch-pi-openai-catalog.mjs",
 		"dev": "npm run plugins:build-core && npm run plugins:build-authoring && next dev -H localhost",
+		"prebuild": "node scripts/patch-pi-openai-catalog.mjs",
 		"build": "npm run plugins:build-core && npm run plugins:build-authoring && next build",
 		"start": "next start -H localhost",
 		"test": "NODE_ENV=test tsx --test tests/*.test.ts tests/*.test.tsx",

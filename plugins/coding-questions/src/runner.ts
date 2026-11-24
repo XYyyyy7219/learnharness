@@ -71,7 +71,7 @@ async function observeProcess(
     });
   } catch (error) {
     checkAbort(signal);
-    return result("error", null, `Could not launch test process: ${errorMessage(error)}`);
+    return result("error", null, `无法启动测试进程（${errorMessage(error)}）`);
   }
 
   return new Promise<CodingTestResult>((resolve, reject) => {
@@ -112,10 +112,10 @@ async function observeProcess(
         try {
           await terminate();
           checkAbort(signal);
-          if (timedOut) resolve(result("error", exitCode, "Test process exceeded the 30 second timeout"));
-          else if (launchError) resolve(result("error", null, `Could not launch test process: ${launchError.message}`));
-          else if (exitSignal !== null) resolve(result("error", exitCode, `Test process terminated by signal ${exitSignal}`));
-          else if (exitCode === null) resolve(result("error", null, "Test process exited without an exit code"));
+          if (timedOut) resolve(result("error", exitCode, "测试进程超过 30 秒超时限制"));
+          else if (launchError) resolve(result("error", null, `无法启动测试进程（${launchError.message}）`));
+          else if (exitSignal !== null) resolve(result("error", exitCode, `测试进程被信号 ${exitSignal} 终止`));
+          else if (exitCode === null) resolve(result("error", null, "测试进程退出，但未返回退出码"));
           else resolve(result(exitCode === 0 ? "passed" : "failed", exitCode));
         } catch (error) { reject(error); }
         finally { signal?.removeEventListener("abort", onAbort); }

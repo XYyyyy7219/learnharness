@@ -125,7 +125,7 @@ export function SidebarFolderRow({ folder, depth, open, dropActive, renaming, on
 				</div>
 			) : (
 				<button type="button" data-testid={`sidebar-folder-${folder.id}`} aria-expanded={open}
-					aria-label={`${open ? "Collapse" : "Expand"} folder ${folder.name}`}
+					aria-label={`${open ? "Collapse" : "Expand"}文件夹${folder.name}`}
 					onClick={onToggle} onContextMenu={onContextMenu}
 					className={cn("flex w-full items-center gap-1 pr-3 text-left hover:bg-accent", compact ? SIDEBAR_COMPACT_ROW : "py-1.5")}
 					style={{ paddingLeft: sidebarFolderBox(depth).paddingLeft }}>

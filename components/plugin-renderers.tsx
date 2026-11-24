@@ -46,7 +46,7 @@ export function PluginCodeBlock({ language, source, meta, incomplete, fallback }
 	const mount = useMemo<PluginMount>(() => (container, signal) => registration?.renderer.mount(container, { language, source, meta, incomplete, signal }),
 		[registration, language, source, meta, incomplete]);
 	if (!registration) return <>{fallback}</>;
-	return <RendererMount registration={registration} mount={mount} label={`Plugin code block (${language})`} fallback={fallback} />;
+	return <RendererMount registration={registration} mount={mount} label={`插件代码块（${language}）`} fallback={fallback} />;
 }
 
 /** Preserve native text (and an honest image attachment note) when no details
@@ -90,12 +90,12 @@ export function PluginToolRenderer({ part, fallback: suppliedFallback }: { part:
 		jobs.some(job => job.kind === "plugin" && job.toolCallId === part.toolCallId) ||
 		(ack !== null && typeof ack === "object" && typeof ack.jobId === "string" && ack.dispatched === true)
 	);
-	if (part.pluginQuestion) return <p role="status" className="text-xs text-muted-foreground">Question unavailable</p>;
+	if (part.pluginQuestion) return <p role="status" className="text-xs text-muted-foreground">问题不可用</p>;
 	const fallback = suppliedFallback ?? (dispatched
 		? <DispatchCard kind="plugin" toolCallId={part.toolCallId ?? ""} />
 		: <ToolCallCard part={toolFallbackPart(part)} />);
 	if (!registration || !isToolState(part.state)) return fallback;
-	return <RendererMount registration={registration} mount={mount} label={`Plugin tool (${toolName})`} fallback={fallback} />;
+	return <RendererMount registration={registration} mount={mount} label={`插件工具（${toolName}）`} fallback={fallback} />;
 }
 
 function isToolState(state: unknown): state is PluginToolRenderProps["state"] {
@@ -108,7 +108,7 @@ function isToolState(state: unknown): state is PluginToolRenderProps["state"] {
 export function ToolPartRenderer({ part }: { part: LhViewPart }) {
 	// Attempts/unreadable metadata must never fall through to raw payloads or
 	// validator error text, including when the renderer is missing.
-	if (part.pluginQuestion) return <p role="status" className="text-xs text-muted-foreground">Question unavailable</p>;
+	if (part.pluginQuestion) return <p role="status" className="text-xs text-muted-foreground">问题不可用</p>;
 	const toolName = part.type.slice("tool-".length);
 	const Builtin = Object.hasOwn(artifactRenderers, toolName) ? artifactRenderers[toolName] : undefined;
 	const reserved = Builtin || toolName === "plan_init" || (QUESTION_TOOLS as readonly string[]).includes(toolName);

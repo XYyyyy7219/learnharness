@@ -442,7 +442,7 @@ export function useDictation({ append, destination = "primary", disabled = false
 			if (endGen !== genRef.current) return;
 			appendPendingRef.current = false;
 			appendFailureRef.current = failed;
-			if (failed) setError(failed.error instanceof Error ? failed.error.message : "Dictation transcript could not be applied");
+			if (failed) setError(failed.error instanceof Error ? failed.error.message : "无法应用听写结果");
 			if (recordingOwner === owner) {
 				recordingOwner = null;
 				recordingTarget = null;
@@ -517,12 +517,12 @@ export function useDictation({ append, destination = "primary", disabled = false
 						})
 						.catch(() => {
 							if (gen === genRef.current) {
-								setError("Deepgram reconnect failed");
+								setError("Deepgram 重新连接失败");
 								cleanup();
 							}
 						});
 				} else {
-					setError(`Deepgram connection lost (${ev.code})`);
+					setError(`Deepgram 连接中断（${ev.code}）`);
 					cleanup();
 				}
 			});
@@ -554,7 +554,7 @@ export function useDictation({ append, destination = "primary", disabled = false
 			language = await getLanguage();
 		} catch (e) {
 			if (gen !== genRef.current) return;
-			setError(e instanceof Error ? e.message : "Dictation language unavailable");
+			setError(e instanceof Error ? e.message : "听写语言不可用");
 			cleanup();
 			return;
 		}
@@ -629,7 +629,7 @@ export function useDictation({ append, destination = "primary", disabled = false
 			token = await tokenPromise;
 		} catch (e) {
 			if (gen !== genRef.current) return;
-			setError(e instanceof Error ? e.message : "token unavailable");
+			setError(e instanceof Error ? e.message : "无法获取听写授权");
 			cleanup();
 			return;
 		}
@@ -809,7 +809,7 @@ export function DictationBar({ dictation, disabled = false }: { dictation: Dicta
 		return (
 			<Hint
 				// The error line truncates in the button; its tooltip reveals it.
-				label={error ?? "Dictate"}
+				label={error ?? "听写"}
 				action={error ? undefined : "toggle-dictation"}
 				side="top"
 			>
@@ -824,12 +824,12 @@ export function DictationBar({ dictation, disabled = false }: { dictation: Dicta
 						}
 					}}
 					disabled={disabled || blocked}
-					aria-label={error ? `Dictation failed: ${error}` : "Start dictation"}
+					aria-label={error ? `听写失败（${error}）` : "开始听写"}
 					data-testid="dictation-toggle"
 					className="flex h-7 w-full items-center justify-center gap-1.5 rounded-md border border-border/50 bg-card/50 text-xs text-muted-foreground/70 shadow-lg backdrop-blur transition-colors hover:border-border hover:text-muted-foreground"
 				>
 					<MicIcon className="size-3.5" />
-					<span className="max-w-full truncate">{error ?? "Dictate"}</span>
+					<span className="max-w-full truncate">{error ?? "听写"}</span>
 				</button>
 			</Hint>
 		);
@@ -837,17 +837,17 @@ export function DictationBar({ dictation, disabled = false }: { dictation: Dicta
 
 	return (
 		<div className="flex w-full min-w-0 items-center gap-2" data-testid="dictation-bar">
-			<Hint label="Stop dictation (Esc)" side="top">
+			<Hint label="停止听写（Esc）" side="top">
 				<button
 					type="button"
 					onClick={toggle}
 					disabled={phase === "stopping"}
-					aria-label="Stop dictation"
+					aria-label="停止听写"
 					data-testid="dictation-toggle"
 					className="flex h-7 shrink-0 items-center gap-1.5 rounded-md bg-destructive/10 px-2 text-xs font-medium text-destructive transition-colors hover:bg-destructive/20"
 				>
 					{phase === "stopping" ? <Loader2Icon className="size-3.5 animate-spin" /> : <MicIcon className="size-3.5" />}
-					Stop
+					停止
 				</button>
 			</Hint>
 			<span className="size-1.5 shrink-0 animate-pulse rounded-full bg-destructive" aria-hidden />

@@ -52,13 +52,13 @@ export function DeleteNodeBody({
 		<div
 			role="dialog"
 			aria-modal="true"
-			aria-label="Delete node"
+			aria-label="删除节点"
 			data-testid="delete-node-dialog"
 			onClick={(e) => e.stopPropagation()}
 			className="w-[32rem] max-w-[calc(100vw-2rem)] rounded-xl border bg-card p-5 shadow-xl"
 		>
 			<h2 className="text-sm font-semibold text-destructive">
-				{folders.length > 0 ? (nodes.length > 0 ? "Delete nodes and remove empty folders?" : "Remove empty folders?") : nodes.length === 1 ? "Delete node?" : `Delete ${nodes.length} nodes?`}
+				{folders.length > 0 ? (nodes.length > 0 ? "删除节点和空文件夹？" : "删除空文件夹？") : nodes.length === 1 ? "删除节点？" : `删除 ${nodes.length} 个节点？`}
 			</h2>
 			{/* The node name(s) below the title in JetBrains Mono (owner,
 			    2026-09-24): the name is the payload — mono suits it, and
@@ -77,18 +77,18 @@ export function DeleteNodeBody({
 				) : (
 					<code data-testid="node-names-code" className="font-mono text-sm text-foreground">
 						{nodes.slice(0, 8).map((n) => n.name).join(", ")}
-						{nodes.length > 8 ? `, and ${nodes.length - 8} more` : ""}
+						{nodes.length > 8 ? `，另有 ${nodes.length - 8} 项` : ""}
 					</code>
 				)}
 			</div>
-			{folders.length > 0 && <p className="mt-2 text-sm" data-testid="folder-removal-names">Empty folders: {folders.map((f) => f.name).join(", ")}</p>}
+			{folders.length > 0 && <p className="mt-2 text-sm" data-testid="folder-removal-names">空文件夹 {folders.map((f) => f.name).join(", ")}</p>}
 			{nodes.length > 0 && <p className="mt-2 text-sm text-muted-foreground" data-testid="node-permanence-line">
 				{nodes.length === 1
-					? "This permanently deletes the node — this cannot be undone."
-					: `This permanently deletes all ${nodes.length} nodes — this cannot be undone.`}
+					? "节点将被永久删除，无法撤销。"
+					: `这 ${nodes.length} 个节点将被永久删除，无法撤销。`}
 			</p>}
 			<p className="mt-2 text-xs text-muted-foreground" data-testid="folder-removal-explanation">
-				{folders.length > 0 ? "Only the named empty folders are removed. " : ""}Sessions, imported source records, and non-empty folders are kept.
+				{folders.length > 0 ? "只移除所列的空文件夹。" : ""}会话、导入记录和非空文件夹将保留。
 			</p>
 			{failure && (
 				<div
@@ -106,7 +106,7 @@ export function DeleteNodeBody({
 						disabled={busy}
 						className="ml-3 text-xs text-foreground underline-offset-2 hover:underline disabled:opacity-40"
 					>
-						Try again
+						重试
 					</button>
 				</div>
 			)}
@@ -118,7 +118,7 @@ export function DeleteNodeBody({
 					disabled={busy}
 					className="rounded-sm px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
 				>
-					Cancel
+					取消
 				</button>
 				<button
 					type="button"
@@ -130,7 +130,7 @@ export function DeleteNodeBody({
 					// refusal banner): border + text, fill on hover.
 					className="rounded-sm border border-destructive/50 bg-destructive/10 px-3 py-1.5 text-xs text-destructive transition-colors hover:bg-destructive/20 disabled:opacity-40"
 				>
-					{busy ? "Deleting…" : "Delete"}
+					{busy ? "正在删除…" : "删除"}
 				</button>
 			</div>
 		</div>

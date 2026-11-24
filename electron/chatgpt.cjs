@@ -13,22 +13,25 @@ const AUTHORIZE = `${ISSUER}/api/accounts/authorize`;
 const TOKEN = `${ISSUER}/api/accounts/oauth/token`;
 const JWKS = `${ISSUER}/.well-known/jwks.json`;
 const SCOPES = ["openid", "profile", "email", "offline_access", "resource.invoke", "chatgpt.tokens.use.direct"];
-const REVOCATION_WARNING = "Account disconnected locally. Remote revocation could not be confirmed.";
+const REVOCATION_WARNING = "已断开本地账号。无法确认服务端是否已撤销授权。";
 const random = () => crypto.randomBytes(32).toString("base64url");
 const fail = (code) => Object.assign(new Error(code), { code });
 const publicError = (err) => ({
-	cancelled: "ChatGPT sign-in cancelled.",
-	timeout: "ChatGPT sign-in timed out. Try again.",
-	storage: "ChatGPT credentials could not be read or saved. Check local file access, then reconnect before making requests.",
-	identity: "ChatGPT sign-in could not be verified. Select the intended saved account and try again.",
-	scope: "ChatGPT plan permission is missing. Reconnect and authorize ChatGPT plan use.",
-	disconnected: "This ChatGPT connection is disconnected. Reconnect in Providers.",
-	background: "ChatGPT background use is off in this app. Enable Allow background use for all ChatGPT accounts in Providers, or explicitly select an API-key model for that workload.",
-	catalog: "The ChatGPT account model catalog is unavailable. Retry the connection; no API-key fallback was used.",
-	expired: "The ChatGPT session expired. Reconnect in Providers.",
-	network: "ChatGPT could not be reached. Check your connection and try again.",
-	pending: "A ChatGPT sign-in is already pending.",
-	unavailable: "ChatGPT sign-in is unavailable in browser-only mode.",
+	cancelled: "已取消 ChatGPT 登录。",
+	timeout: "ChatGPT 登录超时，请重试。",
+	storage: "无法读取或保存 ChatGPT 凭据。请检查本地文件访问权限后重新连接。",
+	identity: "无法验证 ChatGPT 登录。请选择要使用的已保存账号后重试。",
+	scope: "未授予 ChatGPT 套餐权限。请重新连接并授权使用套餐。",
+	disconnected: "ChatGPT 已断开，请在「服务商」中重新连接。",
+	background: "此应用的 ChatGPT 后台使用已关闭。请在「服务商」中允许 ChatGPT 账号用于后台工作，或为此任务明确选择 API 密钥模型。",
+	catalog: "ChatGPT 账号的模型目录不可用，请重新连接。连接会继续使用订阅授权。",
+	region: "OpenAI 拒绝了此连接，因为当前网络地区不受支持。",
+	denied: "OpenAI 拒绝了 ChatGPT 授权。请检查账号或工作区的访问权限。",
+	grant: "OpenAI 拒绝了本次一次性登录。请在「服务商」中重新开始登录。",
+	expired: "ChatGPT 会话已过期，请在「服务商」中重新连接。",
+	network: "无法连接 ChatGPT。请检查网络后重试。",
+	pending: "已有一项 ChatGPT 登录正在进行。",
+	unavailable: "纯浏览器模式下无法使用 ChatGPT 登录。",
 }[err?.code] || "ChatGPT sign-in failed. Try again; no API-key fallback was used.");
 
 const nonempty = (v) => typeof v === "string" && v.length > 0 && !/[\x00-\x20\x7f]/.test(v);
@@ -207,22 +210,29 @@ function createChatGPT({ store, openExternal, fetch: request = globalThis.fetch,
 		try { await ready(); } catch (err) { return { ...snapshot(), available: false, error: publicError(err) }; }
 		return snapshot();
 	}
-	async function json(url, options = {}) {
+	async function json(url, options = {}, grantType) {
+		let response;
 		try {
-			const response = await request(url, { ...options, redirect: "error", signal: options.signal ?? AbortSignal.timeout(15000) });
-			if (!response.ok) {
-				const body = await response.json().catch(() => ({}));
-				const oauthCode = typeof body.error === "string" ? body.error : body.error?.code;
-				throw Object.assign(fail(oauthCode === "invalid_grant" || response.status === 401 || response.status === 403 ? "expired" : "network"), { oauthCode });
-			}
-			return await response.json();
-		} catch (err) { throw err.code ? err : fail("network"); }
+			response = await request(url, { ...options, redirect: "error", signal: options.signal ?? AbortSignal.timeout(15000) });
+		} catch { throw fail("network"); }
+		const body = await response.json().catch(() => undefined);
+		if (!response.ok) {
+			const oauthCode = typeof body?.error === "string" ? body.error : body?.error?.code ?? body?.error?.type ?? body?.code;
+			let kind = "network";
+			if (oauthCode === "unsupported_country_region_territory") kind = "region";
+			else if (oauthCode === "invalid_grant") kind = grantType === "refresh_token" ? "expired" : "grant";
+			else if (oauthCode === "invalid_token") kind = "expired";
+			else if (response.status === 401 || response.status === 403 || oauthCode === "access_denied" || oauthCode === "invalid_client") kind = "denied";
+			throw Object.assign(fail(kind), { oauthCode });
+		}
+		if (body === undefined) throw fail("network");
+		return body;
 	}
 	async function identity(idToken, clientId, nonce, expectedSubject) {
+		// Fixed, documented JWKS origin; never follow a discovery-supplied URL.
+		const keys = await json(JWKS);
 		try {
 			const { jwtVerify, createLocalJWKSet } = await import("jose");
-			// Fixed, documented JWKS origin; never follow a discovery-supplied URL.
-			const keys = await json(JWKS);
 			const { payload } = await jwtVerify(idToken, createLocalJWKSet(keys), {
 				issuer: ISSUER, audience: clientId, algorithms: ["RS256"],
 				requiredClaims: ["sub", "exp", "iat"], clockTolerance: 5,
@@ -245,7 +255,7 @@ function createChatGPT({ store, openExternal, fetch: request = globalThis.fetch,
 		return { accessToken: body.access_token, refreshToken, idToken: body.id_token ?? previous?.idToken, scopes, expiresAt: Date.now() + body.expires_in * 1000 };
 	}
 	async function grant(fields, signal) {
-		return json(TOKEN, { method: "POST", headers: { "content-type": "application/x-www-form-urlencoded", accept: "application/json" }, body: new URLSearchParams({ ...fields, resource: RESOURCE }), signal });
+		return json(TOKEN, { method: "POST", headers: { "content-type": "application/x-www-form-urlencoded", accept: "application/json" }, body: new URLSearchParams({ ...fields, resource: RESOURCE }), signal }, fields.grant_type);
 	}
 
 	async function login(accountId) {
@@ -292,12 +302,14 @@ function createChatGPT({ store, openExternal, fetch: request = globalThis.fetch,
 				if (req.method !== "GET" || callback.origin !== new URL(redirectUri).origin || callback.pathname !== "/auth/callback" || req.headers.host !== new URL(redirectUri).host || consumed) { res.writeHead(404).end(); return; }
 				const params = callback.searchParams;
 				// Reject duplicate parameters and unsolicited callbacks without consuming a valid pending attempt.
-				if (["state", "code", "client_id", "error"].some((key) => params.getAll(key).length > 1) || params.get("state") !== expectedState) { res.writeHead(400).end("Sign-in could not be verified."); return; }
+				if (["state", "code", "client_id", "error"].some((key) => params.getAll(key).length > 1) || params.get("state") !== expectedState) { res.writeHead(400).end("无法验证此次登录。"); return; }
 				consumed = true;
-				res.writeHead(200, { "content-type": "text/plain; charset=utf-8" }).end("Return to LearnHarness to view the sign-in result. You may close this tab.");
+				res.writeHead(200, { "content-type": "text/plain; charset=utf-8" }).end("请返回 LearnHarness 查看登录结果。可以关闭此标签页。");
 				cleanup();
 				try {
-					if (params.has("error")) throw fail(params.get("error") === "access_denied" ? "cancelled" : "identity");
+					const callbackError = params.get("error");
+					if (callbackError === "unsupported_country_region_territory") throw fail("region");
+					if (callbackError !== null) throw fail(callbackError === "access_denied" ? "cancelled" : "identity");
 					const clientId = params.get("client_id") || selected?.clientId;
 					if (!clientId || clientId === "dynamic_agent_client" || clientId.length > 512 || /[\s\x00-\x1f]/.test(clientId) || (selected && clientId !== selected.clientId) || !params.get("code")) throw fail("identity");
 					let body;

@@ -75,8 +75,8 @@ export function PromptSegmentDialog({ name, source, override, mode, returnFocusF
 			else if (result === "activation-failed") {
 				setSavedText(text);
 				setActivationFailed(true);
-				setError("Override saved, but it couldn't be put in use. Retry activation below.");
-			} else setError("Couldn't save the override. Your edits are still here.");
+				setError("自定义版本已保存，但未能启用。请在下方重试。");
+			} else setError("无法保存自定义版本，你的修改仍保留在编辑框中。");
 		} finally {
 			pending.current = false;
 			setBusy(null);
@@ -91,8 +91,8 @@ export function PromptSegmentDialog({ name, source, override, mode, returnFocusF
 		try {
 			const result = await onDelete();
 			if (result === "deleted") onClose();
-			else if (result === "settings-busy") setError("Settings is still saving. Try deleting the override again after the save finishes.");
-			else setError("Couldn't delete the override.");
+			else if (result === "settings-busy") setError("设置仍在保存，请在保存结束后重试删除自定义版本。");
+			else setError("无法删除自定义版本。");
 		} finally {
 			pending.current = false;
 			setBusy(null);
@@ -107,8 +107,8 @@ export function PromptSegmentDialog({ name, source, override, mode, returnFocusF
 				<h2 id={titleId} className="text-sm font-semibold">{title}</h2>
 				<p id={nameId} className="mt-0.5 font-prose text-(length:--lh-prose-size) text-muted-foreground">{name}</p>
 			</div>
-			<SettingsSegmentedControl label="Prompt display" disabled={confirmDiscard}
-				options={[{ value: "markdown", label: "Markdown" }, { value: "preview", label: "Preview" }]}
+			<SettingsSegmentedControl label="提示词显示方式" disabled={confirmDiscard}
+				options={[{ value: "markdown", label: "Markdown" }, { value: "preview", label: "预览" }]}
 				value={preview ? "preview" : "markdown"} onChange={next => setPreview(next === "preview")} />
 		</header>
 		<div className="flex min-h-0 flex-1 flex-col px-4 pt-4" inert={confirmDiscard}>
@@ -117,17 +117,17 @@ export function PromptSegmentDialog({ name, source, override, mode, returnFocusF
 		<footer className="flex shrink-0 flex-col gap-2 px-4 py-3">
 			{error && <p role="alert" className="text-xs text-error">{error}</p>}
 			{confirmDiscard ? <div className="flex flex-wrap items-center justify-between gap-2">
-				<p role="status" className="text-xs">Discard unsaved changes?</p>
+				<p role="status" className="text-xs">放弃未保存的更改？</p>
 				<div className="ml-auto flex gap-2">
-					<Button ref={keepEditing} type="button" variant="outline" size="sm" onClick={resumeEditing}>Keep editing</Button>
-					<Button type="button" variant="destructive" size="sm" onClick={onClose}>Discard changes</Button>
+					<Button ref={keepEditing} type="button" variant="outline" size="sm" onClick={resumeEditing}>继续编辑</Button>
+					<Button type="button" variant="destructive" size="sm" onClick={onClose}>放弃更改</Button>
 				</div>
 			</div> : <div className="flex flex-wrap items-center justify-between gap-2">
-				{editing && savedText !== null && <button type="button" className="rounded-sm border border-destructive/50 bg-destructive/10 px-3 py-1.5 text-xs text-destructive transition-colors hover:bg-destructive/20 disabled:opacity-40" disabled={busy !== null || dirty} onClick={() => void remove()}>{busy === "delete" ? "Deleting…" : "Delete override"}</button>}
+				{editing && savedText !== null && <button type="button" className="rounded-sm border border-destructive/50 bg-destructive/10 px-3 py-1.5 text-xs text-destructive transition-colors hover:bg-destructive/20 disabled:opacity-40" disabled={busy !== null || dirty} onClick={() => void remove()}>{busy === "delete" ? "正在删除…" : "删除自定义版本"}</button>}
 				<div className="ml-auto flex gap-2">
-					<Button ref={closeButton} type="button" variant="ghost" size="sm" disabled={busy !== null} onClick={requestClose}>Close</Button>
+					<Button ref={closeButton} type="button" variant="ghost" size="sm" disabled={busy !== null} onClick={requestClose}>关闭</Button>
 					{editing && <Button type="button" size="sm" disabled={busy !== null || (!dirty && !activationFailed)} onClick={() => void save()}>
-						{busy === "save" ? "Saving…" : activationFailed && !dirty ? "Retry activation" : "Save and activate"}
+						{busy === "save" ? "正在保存…" : activationFailed && !dirty ? "重试启用" : "保存并启用"}
 					</Button>}
 				</div>
 			</div>}

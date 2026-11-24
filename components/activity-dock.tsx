@@ -237,7 +237,7 @@ export function toBlobs(feed: ActivityFeed): ActivityBlob[] {
 			id: job.id,
 			process: "job",
 			jobKind: job.kind,
-			title: job.kind === "plugin" ? job.plugin?.label || job.plugin?.toolName || "Plugin worker" : job.title,
+			title: job.kind === "plugin" ? job.plugin?.label || job.plugin?.toolName || "插件任务" : job.title,
 			chatId: job.chatId,
 			startedAt: Date.parse(job.createdAt) || 0,
 			cost: job.costUsd ?? null,
@@ -293,8 +293,8 @@ export function formatElapsed(ms: number): string {
 	const s = Math.max(0, Math.floor(ms / 1000));
 	if (s < 60) return `${s}s`;
 	const m = Math.floor(s / 60);
-	if (m < 60) return `${m}m ${String(s % 60).padStart(2, "0")}s`;
-	return `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, "0")}m`;
+	if (m < 60) return `${m} 分 ${String(s % 60).padStart(2, "0")} 秒`;
+	return `${Math.floor(m / 60)} 小时 ${String(m % 60).padStart(2, "0")} 分`;
 }
 
 // ─── The section (the sidebar's bottom strip) ─────────────────────────────────
@@ -380,9 +380,9 @@ export function ActivitySection({ feed: feedProp }: { feed?: ActivityFeed }) {
 		<section data-testid="activity-section" className="border-t border-border px-3 pb-3 pt-2">
 			<div className="mb-1 flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground/70">
 				<ActivityIcon className="size-3" />
-				Background agents
+				后台任务
 				{blobs.length > 0 && (
-					<span className="ml-auto tabular-nums" data-testid="activity-total-cost" title="Total running cost (inferred)">
+					<span className="ml-auto tabular-nums" data-testid="activity-total-cost" title="当前总费用（估算）">
 						{planCostLabel(totalCost, subscriptionLabels(blobs.map((blob) => blob.model)))}
 				</span>
 				)}
@@ -476,8 +476,8 @@ function ActivityBlobRow({
 					data-testid="activity-abort"
 					onClick={onAbort}
 					disabled={abortState !== undefined}
-					title={abortState === "failed" ? "Abort failed — try again" : "End this background process"}
-					aria-label={`End ${label} in ${blob.title}`}
+					title={abortState === "failed" ? "中止失败，请重试" : "结束此后台任务"}
+					aria-label={`结束 ${blob.title} 中的 ${label}`}
 					className="absolute right-1 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground/70 transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
 				>
 					<SquareIcon className="size-3" />
@@ -499,13 +499,13 @@ function ActivityBlobRow({
 					<div className="flex flex-col gap-1 text-muted-foreground">
 						{blob.activity && <div className="break-words">{blob.activity}</div>}
 						<div className="flex justify-between gap-2">
-							<span>Cost</span>
+							<span>费用</span>
 							<span className="tabular-nums text-card-foreground">
 								{planCostLabel(blob.cost, subscriptionLabel(blob.model))}
 							</span>
 						</div>
 						<div className="flex justify-between gap-2">
-							<span>Context</span>
+							<span>上下文</span>
 							<span className="tabular-nums text-card-foreground" data-testid="activity-blob-context">
 								{blob.context === null
 									? "—"
@@ -514,19 +514,19 @@ function ActivityBlobRow({
 						</div>
 						{blob.model && (
 							<div className="flex justify-between gap-2">
-								<span>Model</span>
+								<span>模型</span>
 								<span className="truncate text-card-foreground">{blob.model}</span>
 							</div>
 						)}
 						{blob.steps !== undefined && (
 							<div className="flex justify-between gap-2">
-								<span>Steps</span>
+								<span>步骤</span>
 								<span className="tabular-nums text-card-foreground">{blob.steps}</span>
 							</div>
 						)}
 						{blob.chatId && (
 							<a href={`/chat/${blob.chatId}`} className="text-primary hover:underline">
-								Open session →
+								打开会话 →
 							</a>
 						)}
 					</div>

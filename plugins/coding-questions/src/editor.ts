@@ -62,9 +62,9 @@ function createCodeView(container: HTMLElement, language: string, code: string, 
   });
 
   const languageDescription = findLanguage(language);
-  if (!languageDescription) status.textContent = "Plain text";
+  if (!languageDescription) status.textContent = "纯文本";
   else {
-    status.textContent = "Loading highlighting…";
+    status.textContent = "正在加载语法高亮…";
     void languageDescription.load().then(support => {
       if (disposed) return;
       // Catalog support may include tag insertion, completion keymaps or other
@@ -75,7 +75,7 @@ function createCodeView(container: HTMLElement, language: string, code: string, 
       ]) });
       status.textContent = "";
     }).catch(() => {
-      if (!disposed) status.textContent = "Plain text";
+      if (!disposed) status.textContent = "纯文本";
     });
   }
 

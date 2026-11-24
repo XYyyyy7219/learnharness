@@ -15,7 +15,7 @@ export const LANGUAGES: Record<Family, Language> = {
   chemicalStructures: "smiles", musicalNotation: "abc", technicalDiagrams: "tikz",
 };
 export const LABELS: Record<Family, string> = {
-  chemicalStructures: "Chemical structures", musicalNotation: "Musical notation", technicalDiagrams: "Technical diagrams",
+  chemicalStructures: "化学结构", musicalNotation: "乐谱", technicalDiagrams: "技术图",
 };
 export const INSTRUCTIONS: Record<Family, string> = {
   chemicalStructures: "For chemical structures, use a smiles fenced code block containing one SMILES molecule. Write explanations outside the block; do not author raw SVG.",

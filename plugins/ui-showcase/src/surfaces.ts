@@ -9,29 +9,29 @@ export function mountOverlayExamples(ui: PluginUi, body: HTMLElement, life: Scop
   const show = readout(body, kind);
   const render = () => show({ selection, opens, lastCallback });
   if (kind === "menus") {
-    note(body, "Enabled and disabled items, local selection, and preferred opening sides. The host owns positioning, dismissal, Escape and focus return.");
+    note(body, "展示启用项、禁用项、本地选择和首选展开方向。定位、关闭、Esc 与焦点恢复由宿主处理。");
     const actions = row(body);
     for (const preferredSide of ["down", "up"] as const) {
       const anchor = example(actions, `menu-${preferredSide}`);
-      life.widget(ui.mountButton(anchor, { label: `Open menu (${preferredSide})`, variant: "outline", onClick() {
+      life.widget(ui.mountButton(anchor, { label: `打开菜单（${preferredSide}）`, variant: "outline", onClick() {
         if (life.signal.aborted) return;
         opens++; lastCallback = `openMenu (${preferredSide})`; render();
         life.widget(ui.openMenu(anchor.querySelector("button") ?? anchor, {
-          label: `Showcase menu (${preferredSide})`, preferredSide,
+          label: `示例菜单（${preferredSide}）`, preferredSide,
           items: [
-            { key: "first", label: "Select first example", onSelect() { selection = "first"; lastCallback = "first.onSelect"; render(); } },
-            { key: "disabled", label: "Disabled example", disabled: true, onSelect() { throw new Error("Disabled menu item must not run"); } },
-            { key: "second", label: "Select second example", onSelect() { selection = "second"; lastCallback = "second.onSelect"; render(); } },
+            { key: "first", label: "选择第一个示例", onSelect() { selection = "first"; lastCallback = "first.onSelect"; render(); } },
+            { key: "disabled", label: "禁用示例", disabled: true, onSelect() { throw new Error("Disabled menu item must not run"); } },
+            { key: "second", label: "选择第二个示例", onSelect() { selection = "second"; lastCallback = "second.onSelect"; render(); } },
           ],
           onClose() { if (!life.signal.aborted) { lastCallback = "menu.onClose"; render(); } },
         }, { signal: life.signal }));
       } }, { signal: life.signal }));
     }
   } else {
-    note(body, "Ordinary, long-scroll and nested host dialogs. Covered parents retain their local text and scroll. No plugin keyboard handlers or focus overrides are installed.");
+    note(body, "展示普通、可长滚动和嵌套的宿主对话框。被覆盖的父对话框会保留本地文本与滚动位置。");
     const actions = row(body);
     for (const mode of ["ordinary", "long", "nested"] as const) {
-      button(ui, actions, life, `dialog-${mode}`, { label: mode === "long" ? "Open long-scroll dialog" : `Open ${mode} dialog`, variant: "outline", onClick() {
+      button(ui, actions, life, `dialog-${mode}`, { label: mode === "long" ? "打开长滚动对话框" : `打开 ${mode} 对话框`, variant: "outline", onClick() {
         opens++; lastCallback = `openDialog (${mode})`; render();
         openDialog(ui, life, mode, () => { if (!life.signal.aborted) { lastCallback = `${mode}.onClose`; render(); } });
       } });
@@ -42,23 +42,23 @@ export function mountOverlayExamples(ui: PluginUi, body: HTMLElement, life: Scop
 
 function openDialog(ui: PluginUi, owner: Scope, mode: "ordinary" | "long" | "nested", onClose: () => void): void {
   owner.widget(ui.openDialog({
-    title: mode === "long" ? "Long-scroll example" : mode === "nested" ? "Parent dialog example" : "Ordinary dialog example",
+    title: mode === "long" ? "长滚动示例" : mode === "nested" ? "父对话框示例" : "普通对话框示例",
     content(container, signal) {
       const life = new Scope(signal);
       if (signal.aborted) return life.dispose;
       const root = element("div", undefined, "ui-showcase ui-showcase-overlay");
       root.dataset.showcase = `dialog-${mode}`;
       container.append(root); life.own(() => root.remove());
-      note(root, "This is plugin-owned content inside the real host dialog. Use its X or Escape to close it.");
+      note(root, "这些内容由插件提供，显示在实际的宿主对话框中。点击 × 或按 Esc 关闭。");
       retainedField(ui, root, life, `dialog-${mode}`);
       if (mode === "ordinary") knowledgeExample(ui, root, life, "dialog-ordinary-knowledge");
       if (mode === "long") {
         for (let index = 1; index <= 32; index++) {
-          note(root, `Paragraph ${index}. This static content makes the dialog scroll naturally. Scroll position belongs to this mounted dialog and remains intact while a child is open.`);
+          note(root, `第 ${index} 段。静态内容让对话框可以滚动。打开子对话框时，当前滚动位置会保留。`);
         }
       }
       if (mode !== "ordinary") {
-        button(ui, root, life, `dialog-${mode}-child`, { label: "Open child dialog", onClick() { openDialog(ui, life, "ordinary", () => {}); } });
+        button(ui, root, life, `dialog-${mode}-child`, { label: "打开子对话框", onClick() { openDialog(ui, life, "ordinary", () => {}); } });
       }
       return life.dispose;
     },
@@ -70,7 +70,7 @@ function retainedField(ui: PluginUi, root: HTMLElement, life: Scope, id: string)
   let value = "Retained local text";
   let lastCallback = "none";
   const show = readout(root, id);
-  const schema = () => ({ rows: [{ key: "retained", type: "text" as const, label: "Retained text", description: "Edit this before opening a child. Closing the child does not remount this field.", value,
+  const schema = () => ({ rows: [{ key: "retained", type: "text" as const, label: "保留的文本", description: "打开子对话框前可编辑此字段。关闭子对话框后，字段内容会保留。", value,
     onChange(next: string) { if (!life.signal.aborted) { value = next; lastCallback = "retained.onChange"; field.update(schema()); render(); } },
   }] });
   const field = life.widget(ui.mountSettingsRows(example(root, `${id}-retained-field`), schema(), { signal: life.signal }));
@@ -79,10 +79,10 @@ function retainedField(ui: PluginUi, root: HTMLElement, life: Scope, id: string)
 }
 
 function knowledgeExample(ui: PluginUi, root: HTMLElement, life: Scope, id: string): void {
-  note(root, "Selection stays local to this demo. The host picker also offers source-management actions; those affect your real sources.");
+  note(root, "选择仅用于本演示。宿主选择器中的来源管理操作会作用于真实来源。");
   let value: readonly string[] = [];
   const show = readout(root, id);
-  const picker = life.widget(ui.mountKnowledgePicker(example(root, `${id}-picker`, "Knowledge selection"), {
+  const picker = life.widget(ui.mountKnowledgePicker(example(root, `${id}-picker`, "知识选择"), {
     value, onChange(next) {
       if (life.signal.aborted) return;
       value = [...next]; picker.update({ value }); show({ value });
@@ -114,8 +114,8 @@ function openDemo(ui: PluginUi, signal: AbortSignal, target?: PluginSurfaceTarge
       const root = element("div", undefined, "ui-showcase ui-showcase-surface");
       root.dataset.showcase = "surface";
       container.append(root); scope.own(() => root.remove());
-      family(ui, root, scope, "surfaces", "Surface examples", (body, life) => {
-        note(body, "This real nonmodal host surface covers the page body, leaving its top bar or floating sidebar control outside. The sidebar and global dialogs remain available. Visible headings belong to this plugin; the host supplies only a floating X and an accessible name. Local text is retained while a nested surface covers it. Reset clears this demo's local examples and restores the dimmed background.");
+      family(ui, root, scope, "surfaces", "面板示例", (body, life) => {
+        note(body, "此非模态面板覆盖页面主体，保留顶栏或浮动的侧栏控件。侧栏与全局对话框仍可使用。标题由插件提供，宿主提供浮动的关闭按钮及无障碍名称。嵌套面板打开时会保留本地文本。重置可清除本地示例状态并恢复暗化背景。");
         retainedField(ui, body, life, "surface-parent");
         knowledgeExample(ui, body, life, "surface-knowledge");
         let opened = 0; let closed = 0; let lastCallback = "none";
@@ -125,33 +125,33 @@ function openDemo(ui: PluginUi, signal: AbortSignal, target?: PluginSurfaceTarge
         const render = () => show({ background, nestedOpened: opened, nestedClosed: closed, lastCallback });
         const backgrounds = row(body);
         for (const preset of ["dimmed", "opaque"] as const) {
-          button(ui, backgrounds, life, `surface-background-${preset}`, { label: `${preset === "dimmed" ? "Dimmed" : "Opaque"} background`, variant: "outline", onClick() {
+          button(ui, backgrounds, life, `surface-background-${preset}`, { label: `${preset === "dimmed" ? "Dimmed" : "Opaque"}背景`, variant: "outline", onClick() {
             if (life.signal.aborted) return;
             background = preset; handle?.update({ background }); lastCallback = `surface.update (${preset})`; render();
           } });
         }
-        button(ui, body, life, "surface-nested", { label: "Open nested surface", onClick() {
+        button(ui, body, life, "surface-nested", { label: "打开嵌套面板", onClick() {
           if (life.signal.aborted) return;
           opened++; lastCallback = target === undefined ? "openSurface (current page body)" : "openSurface (same opaque native target)"; render();
           life.widget(open({
-            title: "Nested UI Showcase surface",
+            title: "嵌套的界面展示面板",
             content(childContainer, childSignal) {
               const child = new Scope(childSignal);
               if (childSignal.aborted) return child.dispose;
               const content = element("div", undefined, "ui-showcase ui-showcase-surface");
               content.dataset.showcase = "surface-nested";
               childContainer.append(content); child.own(() => content.remove());
-              note(content, "The parent remains mounted underneath. Close this surface with its host X or Escape, then check the parent's retained text. Menus and dialogs below open above this surface.");
+              note(content, "父面板保留在下方。点击 × 或按 Esc 关闭本面板，即可查看父面板保留的文本。下方的菜单和对话框会在本面板上方打开。");
               retainedField(ui, content, child, "surface-child");
-              family(ui, content, child, "menus", "Menus above surface", (area, lifetime) => mountOverlayExamples(ui, area, lifetime, "menus"));
-              family(ui, content, child, "dialogs", "Dialogs above surface", (area, lifetime) => mountOverlayExamples(ui, area, lifetime, "dialogs"));
+              family(ui, content, child, "menus", "在面板上方打开菜单", (area, lifetime) => mountOverlayExamples(ui, area, lifetime, "menus"));
+              family(ui, content, child, "dialogs", "在面板上方打开对话框", (area, lifetime) => mountOverlayExamples(ui, area, lifetime, "dialogs"));
               return child.dispose;
             },
             onClose() { if (!life.signal.aborted) { closed++; lastCallback = "nested surface.onClose"; render(); } },
           }, life.signal));
         } });
-        family(ui, body, life, "menus", "Menus above surface", (area, lifetime) => mountOverlayExamples(ui, area, lifetime, "menus"));
-        family(ui, body, life, "dialogs", "Dialogs above surface", (area, lifetime) => mountOverlayExamples(ui, area, lifetime, "dialogs"));
+        family(ui, body, life, "menus", "在面板上方打开菜单", (area, lifetime) => mountOverlayExamples(ui, area, lifetime, "menus"));
+        family(ui, body, life, "dialogs", "在面板上方打开对话框", (area, lifetime) => mountOverlayExamples(ui, area, lifetime, "dialogs"));
         render();
       });
       return scope.dispose;

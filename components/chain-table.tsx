@@ -321,7 +321,7 @@ export function ChainTableBody({
 				<span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
 					{chains.length} {chains.length === 1 ? "chain" : "chains"} · {nodes.length} {nodes.length === 1 ? "node" : "nodes"}
 				</span>
-				{onOrganizationChange && <button type="button" aria-label="Add folder" data-testid="add-source-folder"
+				{onOrganizationChange && <button type="button" aria-label="添加文件夹" data-testid="add-source-folder"
 					onClick={() => setCreatingFolder(true)} className="lh-no-drag rounded-lg p-2 text-muted-foreground hover:bg-accent"><FolderPlusIcon className="size-4" /></button>}
 				<div className="relative shrink-0">
 					<SearchIcon className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
@@ -330,8 +330,8 @@ export function ChainTableBody({
 						value={query}
 						data-testid="chain-table-search"
 						onChange={(e) => onQuery(e.target.value)}
-						placeholder="Search nodes…"
-						aria-label="Search nodes"
+						placeholder="搜索节点…"
+						aria-label="搜索节点"
 						spellCheck={false}
 						className="lh-no-drag h-8 w-56 rounded-lg border bg-background pl-8 pr-3 text-xs outline-none placeholder:text-muted-foreground focus:border-ring"
 					/>
@@ -340,7 +340,7 @@ export function ChainTableBody({
 					type="button"
 					data-testid="chain-table-close"
 					onClick={onClose}
-					aria-label="Close chains"
+					aria-label="关闭推理链"
 					className="lh-no-drag flex size-8 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-card/80 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
 				>
 					<XIcon className="size-4" />
@@ -364,7 +364,7 @@ export function ChainTableBody({
 						aria-sort={sort.col === "name" ? (sort.dir === 1 ? "ascending" : "descending") : "none"}
 						{...treeColumnLayout({ grow: true, align: "left", className: "flex items-center gap-1 transition-colors hover:text-foreground" })}
 					>
-						Name {dirIcon("name")}
+						名称 {dirIcon("name")}
 					</button>
 					<button
 						type="button"
@@ -373,7 +373,7 @@ export function ChainTableBody({
 						aria-sort={sort.col === "props" ? (sort.dir === 1 ? "ascending" : "descending") : "none"}
 						{...treeColumnLayout({ widthClassName: "w-14", align: "right", className: "flex items-center justify-end gap-1 transition-colors hover:text-foreground" })}
 					>
-						Props {dirIcon("props")}
+						命题 {dirIcon("props")}
 					</button>
 					<button
 						type="button"
@@ -382,7 +382,7 @@ export function ChainTableBody({
 						aria-sort={sort.col === "created" ? (sort.dir === 1 ? "ascending" : "descending") : "none"}
 						{...treeColumnLayout({ widthClassName: "w-20", align: "right", className: "flex items-center justify-end gap-1 transition-colors hover:text-foreground" })}
 					>
-						Created {dirIcon("created")}
+						创建时间 {dirIcon("created")}
 					</button>
 				</TreeHeader>
 
@@ -395,7 +395,7 @@ export function ChainTableBody({
 				</div>}
 				{groups.length === 0 && (directory?.organization.folders.length ?? 0) === 0 && (
 					<div data-testid="chain-table-nomatch" className="px-4 pt-3 text-xs text-muted-foreground">
-						No matching chains.
+						没有匹配的推理链。
 					</div>
 				)}
 
@@ -434,10 +434,10 @@ export function ChainTableBody({
 									indeterminate={selectMode ? selectedCount > 0 && selectedCount < group.nodeIds.length : false}
 									onToggle={(next) => { if (selectMode) onToggleNodes(group.nodeIds, next); else if (group.birth) onToggleSource(group.birth, next); }}
 									testid={`cluster-checkbox-${group.key}`}
-									label={selectMode ? `Select everything born in ${group.label ?? "unlabeled"}` : `Select source ${group.label ?? "unlabeled"}`}
+									label={selectMode ? `选择 ${group.label ?? "unlabeled"} 生成的所有内容` : `选择来源 ${group.label ?? "unlabeled"}`}
 								/>
-								<Expander open={open} onClick={() => toggleCluster(group.key)} testid={`cluster-toggle-${group.key}`} label={`Expand cluster ${group.label ?? "unlabeled"}`} />
-								<button type="button" data-source-icon data-testid={`source-icon-${group.key}`} aria-expanded={open} aria-label={`Expand source ${group.label ?? "unlabeled"}`}
+								<Expander open={open} onClick={() => toggleCluster(group.key)} testid={`cluster-toggle-${group.key}`} label={`展开分组 ${group.label ?? "unlabeled"}`} />
+								<button type="button" data-source-icon data-testid={`source-icon-${group.key}`} aria-expanded={open} aria-label={`展开来源 ${group.label ?? "unlabeled"}`}
 									onClick={() => toggleCluster(group.key)} className={`flex h-5 w-3.5 shrink-0 items-center justify-center rounded ${empty ? "text-muted-foreground/60" : "text-muted-foreground"} transition-colors hover:bg-accent hover:text-foreground`}>
 									{open ? <BookOpenIcon className="size-3.5 shrink-0" /> : <BookIcon className="size-3.5 shrink-0" />}
 								</button>
@@ -482,9 +482,9 @@ export function ChainTableBody({
 													indeterminate={selectedInChain > 0 && selectedInChain < memberIds.length}
 													onToggle={(next) => onToggleNodes(memberIds, next)}
 													testid={`chain-checkbox-${chain.id}`}
-													label={`Select chain ${nameOf(chain.conclusion)}`}
+													label={`选择推理链 ${nameOf(chain.conclusion)}`}
 												/> : <TreeSelectionSpacer />}
-												<Expander open={chainOpen} onClick={() => onToggleChain(chain.id)} testid={`chain-toggle-${chain.id}`} label={`Expand chain ${nameOf(chain.conclusion)}`} />
+												<Expander open={chainOpen} onClick={() => onToggleChain(chain.id)} testid={`chain-toggle-${chain.id}`} label={`展开推理链 ${nameOf(chain.conclusion)}`} />
 												{/* The chain line: proposition names as faint-outlined
 												    chips. THE LOGIC IS THE PAYLOAD (owner rulings,
 												    2026-09-30): premises join with the LaTeX LAND (∧),
@@ -552,7 +552,7 @@ export function ChainTableBody({
 																checked={selection.has(id)}
 																onToggle={(next) => onToggleNodes([id], next)}
 																testid={`prop-checkbox-${id}`}
-																label={`Select node ${node.name}`}
+																label={`选择节点 ${node.name}`}
 															/> : <TreeSelectionSpacer />}
 															<ToolContentResponse
 																mode="static"
@@ -593,17 +593,17 @@ export function ChainTableBody({
 							onClick={onClear}
 							className="rounded-full px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
 						>
-							Clear
+							清除
 						</button>
 						{selectMode ? (
 							<button
 								type="button"
 								data-testid="chain-practice-done"
 								onClick={onSelect}
-								aria-label={`Done picking — ${selection.size} ${selection.size === 1 ? "proposition" : "propositions"} selected`}
+								aria-label={`选取完成，已选 ${selection.size} 个${selection.size === 1 ? "proposition" : "propositions"}`}
 								className="flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/80"
 							>
-								Done
+								完成
 							</button>
 						) : (
 							<>
@@ -616,11 +616,11 @@ export function ChainTableBody({
 								type="button"
 								data-testid="chain-delete"
 								onClick={onDelete}
-								aria-label="Delete selected sources and folders"
+								aria-label="删除所选来源和文件夹"
 								className="flex items-center gap-1.5 rounded-full border border-destructive/50 bg-destructive/10 px-3 py-1.5 text-xs font-medium text-destructive transition-colors hover:bg-destructive/20"
 							>
 								<Trash2Icon aria-hidden="true" className="size-3.5" />
-								Delete
+								删除
 							</button>
 							</>
 						)}

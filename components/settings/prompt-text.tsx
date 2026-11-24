@@ -46,7 +46,7 @@ export function PromptText({ text, preview, fieldRef, onChange, busy }: {
 				</div>
 				<textarea
 					ref={fieldRef}
-					aria-label={onChange ? "Override Markdown" : "Default Markdown"}
+					aria-label={onChange ? "自定义 Markdown" : "默认 Markdown"}
 					value={text}
 					readOnly={!onChange || busy}
 					spellCheck={false}
@@ -57,7 +57,7 @@ export function PromptText({ text, preview, fieldRef, onChange, busy }: {
 				/>
 			</div>
 		</div>
-		{preview && <div className="h-full overflow-auto p-4" tabIndex={0} aria-label="Rendered Markdown">
+		{preview && <div className="h-full overflow-auto p-4" tabIndex={0} aria-label="Markdown 渲染结果">
 			<HostMarkdown text={text} />
 		</div>}
 	</div>;

@@ -11,7 +11,7 @@ import type { ChatDeleteMode, ChatListItem, FolderDeletionScope } from "@/src/co
 export const TRACES_COPY = {
 	testid: "delete-traces",
 	checkbox: "delete-traces-checkbox",
-	title: "Also remove its graph traces",
+	title: "同时清除知识图谱中的关联记录",
 	body: "This session’s topics, links, and events leave the graph too. Topics other sessions or imported notes also cover survive; topics only this session created are removed entirely.",
 };
 
@@ -24,9 +24,9 @@ export interface DeleteDialogCopy {
 }
 
 export const SESSION_DELETE_COPY: DeleteDialogCopy = {
-	label: "Delete session",
+	label: "删除会话",
 	testid: "delete-session-dialog",
-	heading: "Delete session?",
+	heading: "删除会话？",
 	body: "This permanently removes the session — its messages, background jobs, and extraction records. Everything it added to the graph stays unless you check below. This cannot be undone.",
 	traces: TRACES_COPY,
 };
@@ -41,12 +41,12 @@ export function folderDeleteCopy(input: { sessions: number; subfolders: number; 
 		? ` ${count(input.notes, "imported notes file", "imported notes files")} inside ${input.notes === 1 ? "moves" : "move"} to ${input.parentName === null ? "the top level" : `“${input.parentName}”`}.`
 		: "";
 	return {
-		label: "Delete folder",
+		label: "删除文件夹",
 		testid: "delete-folder-dialog",
-		heading: "Delete folder?",
+		heading: "删除文件夹？",
 		body: `This permanently removes the folder and the ${what} inside — the sessions’ messages, background jobs, and extraction records. Everything they added to the graph stays unless you check below.${notes} This cannot be undone.`,
 		traces: {
-			title: "Also remove their graph traces",
+			title: "同时清除知识图谱中的关联记录",
 			body: "These sessions’ topics, links, and events leave the graph too. Topics other sessions or imported notes also cover survive; topics only these sessions created are removed entirely.",
 		},
 	};
@@ -224,7 +224,7 @@ export function DeleteSessionBody({
 						disabled={busy}
 						className="ml-3 text-xs text-foreground underline-offset-2 hover:underline disabled:opacity-40"
 					>
-						Try again
+						重试
 					</button>
 				</div>
 			)}
@@ -239,7 +239,7 @@ export function DeleteSessionBody({
 					disabled={busy}
 					className="rounded-sm px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
 				>
-					Cancel
+					取消
 				</button>
 				<button
 					type="button"
@@ -248,7 +248,7 @@ export function DeleteSessionBody({
 					disabled={busy}
 					className="rounded-sm border border-destructive/50 bg-destructive/10 px-3 py-1.5 text-xs text-destructive transition-colors hover:bg-destructive/20 disabled:opacity-40"
 				>
-					{busy ? "Deleting…" : "Delete"}
+					{busy ? "正在删除…" : "删除"}
 				</button>
 			</div>
 		</div>

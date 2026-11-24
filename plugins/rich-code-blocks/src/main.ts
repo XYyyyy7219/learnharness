@@ -56,7 +56,7 @@ export async function activate(ctx: PluginFrontendContext): Promise<() => void> 
     if (event.topic === "settings-changed") apply(event.data);
   }));
   subscriptions.push(ctx.onResync(() => {
-    void refresh().catch(error => { if (!disposed) console.error("Rich code blocks settings resync failed; retaining the last accepted settings.", error); });
+    void refresh().catch(error => { if (!disposed) console.error("富代码块的设置重新同步失败，已保留上次生效的设置。", error); });
   }));
   try { await refresh(); }
   catch (error) { dispose(); throw error; }

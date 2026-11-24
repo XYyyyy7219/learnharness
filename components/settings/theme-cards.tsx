@@ -127,9 +127,9 @@ export function ThemeCards({
 		<div data-testid="row-theme" className="flex flex-col gap-3 py-1">
 			<div className="flex items-end justify-between gap-4">
 				<span className="min-w-0">
-					<span className="block font-prose text-(length:--lh-prose-size)">Theme</span>
+					<span className="block font-prose text-(length:--lh-prose-size)">主题</span>
 					<span data-testid="theme-hint" className="block text-xs text-muted-foreground/70">
-						{active.name} · {active.mode} · sets every color below
+						{active.name} · {active.mode} · 设置下方所有颜色
 					</span>
 				</span>
 				<button
@@ -139,7 +139,7 @@ export function ThemeCards({
 					className="flex h-7 shrink-0 items-center gap-2 rounded-sm border border-border bg-background px-2 font-ui text-xs text-foreground transition-colors hover:border-muted-foreground/50"
 				>
 					<DownloadIcon className="size-3.5" />
-					Export JSON
+					导出 JSON
 				</button>
 			</div>
 			<div className="grid grid-cols-3 gap-3">
@@ -171,7 +171,7 @@ export function ThemeCards({
 							{!theme.builtin && (
 								<button
 									type="button"
-									aria-label={`Remove ${theme.name}`}
+									aria-label={`移除 ${theme.name}`}
 									data-testid={`theme-remove-${theme.id}`}
 									onClick={() => void remove(theme)}
 									className="absolute right-3 bottom-3 flex size-5 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:text-error"
@@ -190,11 +190,11 @@ export function ThemeCards({
 					className="flex min-h-27 flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-muted-foreground/50 p-3 text-center font-ui text-xs text-muted-foreground transition-colors hover:text-foreground"
 				>
 					<UploadIcon className="size-4" />
-					<span>Import JSON</span>
+					<span>导入 JSON</span>
 					{importError ? (
 						<span data-testid="theme-import-error" className="text-error">{importError}</span>
 					) : (
-						<span className="text-muted-foreground/70">name · mode · colors</span>
+						<span className="text-muted-foreground/70">名称 · 模式 · 颜色</span>
 					)}
 				</button>
 				<input

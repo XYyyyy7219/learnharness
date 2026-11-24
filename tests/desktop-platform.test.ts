@@ -89,6 +89,54 @@ describe("desktop development startup", () => {
 	});
 });
 
+describe("desktop ChatGPT transport", () => {
+	it("uses the configured Electron session and omits ambient credentials", async () => {
+		const stop = new Error("stop before starting the fixture server");
+		const headers = { Accept: "application/json" };
+		const signal = new AbortController().signal;
+		const url = "https://auth.openai.com/.well-known/jwks.json";
+		const body = new URLSearchParams({ fixture: "value" });
+		const response = new Response(null, { status: 200 });
+		let request: typeof fetch | undefined;
+		const desktopSession = {
+			webRequest: { onBeforeSendHeaders() {} },
+			async fetch(input: string, options: RequestInit) {
+				assert.equal(this, desktopSession);
+				assert.equal(input, url);
+				assert.equal(options.credentials, "omit");
+				assert.equal(options.redirect, "error");
+				assert.equal(options.signal, signal);
+				assert.equal(options.headers, headers);
+				assert.equal(options.body, body);
+				return response;
+			},
+		};
+		const context = {
+			require: (id: string) => {
+				if (id === "electron") return {
+					app: { setName() {}, getPath: () => "/fixture/shell", requestSingleInstanceLock: () => false,
+						quit() {}, on() {}, whenReady: async () => {} },
+					nativeTheme: {},
+					session: { defaultSession: desktopSession },
+				};
+				if (id === "./chatgpt.cjs") return {
+					fileStore() {},
+					createChatGPT(options: { fetch: typeof fetch }) { request = options.fetch; },
+				};
+				if (id === "./subscriptions.cjs") return { createSubscriptions() { throw stop; } };
+				return mainRequire(id);
+			},
+			process: { platform: "win32", argv: [], env: {}, on() {} },
+			__dirname: dirname(mainFile),
+			URL,
+		};
+		runInNewContext(mainSource, context, { filename: mainFile });
+		await assert.rejects(runInNewContext("freePort = async () => 9000; main()", context), (err) => err === stop);
+		assert.ok(request);
+		assert.equal(await request(url, { method: "POST", body, credentials: "include", headers, redirect: "error", signal }), response);
+	});
+});
+
 describe("desktop appearance boot and IPC", () => {
 	it("constructs light native chrome before renderer reporting and accepts appearance only from its exact main-frame origin", async () => {
 		const origin = "http://127.0.0.1:9000";

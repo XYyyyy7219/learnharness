@@ -4,7 +4,7 @@ import { Scope, button, element, example, note, readout } from "./dom.ts";
 /** Synthetic controlled values only; the host owns row presentation and keyboard behavior. */
 export function mountTreeDemo(ui: PluginUi, body: HTMLElement, life: Scope): void {
   note(body, "A small synthetic directory using the host tree. Shared item appears under both folders with independent occurrence keys. Selection is optional and never cascades from folders to children. Hiding selection preserves it; Reset clears this family's state.");
-  note(body, "Click a row, then use the host's arrow-row navigation; Space selects an enabled host checkbox. The editable draft keeps its normal input keys. This example owns its 36rem minimum width and horizontal scrolling, not a responsive tree engine.");
+  note(body, "点击一行后，可用方向键逐行移动，按空格选中可用的复选框。草稿输入仍使用正常按键。本示例设定 36rem 的最小宽度并支持横向滚动。");
   let selectionEnabled = false;
   const selectedOccurrenceKeys = new Set<string>();
   const expanded: Record<string, boolean> = { "example-folder": true, "another-folder": true };
@@ -12,7 +12,7 @@ export function mountTreeDemo(ui: PluginUi, body: HTMLElement, life: Scope): voi
   let lastCallback = "none";
   const show = readout(body, "tree");
   let tree: PluginWidgetHandle<PluginTreeProps>;
-  const toggle = button(ui, body, life, "toggle-tree-selection", { label: "Enable selection", variant: "outline", onClick() {
+  const toggle = button(ui, body, life, "toggle-tree-selection", { label: "启用选择", variant: "outline", onClick() {
     if (life.signal.aborted) return;
     selectionEnabled = !selectionEnabled;
     lastCallback = selectionEnabled ? "selection enabled" : "selection disabled";
@@ -25,10 +25,10 @@ export function mountTreeDemo(ui: PluginUi, body: HTMLElement, life: Scope): voi
     const content = new Scope(signal);
     if (life.signal.aborted || content.signal.aborted) { content.dispose(); return content.dispose; }
     const root = element("div");
-    root.append(element("div", "Draft note", "ui-showcase-label font-ui text-xs"));
+    root.append(element("div", "草稿笔记", "ui-showcase-label font-ui text-xs"));
     const input = element("input", undefined, "font-ui text-sm");
     input.type = "text";
-    input.setAttribute("aria-label", "Directory draft");
+    input.setAttribute("aria-label", "目录草稿");
     input.value = draft;
     const change = () => {
       if (life.signal.aborted || content.signal.aborted) return;
@@ -48,19 +48,19 @@ export function mountTreeDemo(ui: PluginUi, body: HTMLElement, life: Scope): voi
   } } : {};
   const folder = (key: string, title: string, children: readonly PluginTreeRow[]): PluginTreeRow => ({
     key, content: title, cells: { kind: "Folder", state: expanded[key] ? "Expanded" : "Collapsed" }, children,
-    ...selection(key, `Select ${title}`),
-    disclosure: { label: `Toggle ${title}`, expanded: expanded[key]!, onChange(value) {
+    ...selection(key, `选择 ${title}`),
+    disclosure: { label: `切换 ${title}`, expanded: expanded[key]!, onChange(value) {
       if (life.signal.aborted) return;
       expanded[key] = value; lastCallback = `disclosure.onChange: ${key}`; render();
     } },
   });
   const rows = (): PluginTreeRow[] => [
-    folder("example-folder", "Example folder", [
-      { key: "example-folder/shared-item", content: "Shared item", cells: { kind: "Note", state: "Repeated" }, ...selection("example-folder/shared-item", "Select Shared item in Example folder") },
-      { key: "example-folder/draft-note", content: draftContent, cells: { kind: "Draft", state: "Editable" }, ...selection("example-folder/draft-note", "Select Draft note") },
+    folder("example-folder", "示例文件夹", [
+      { key: "example-folder/shared-item", content: "Shared item", cells: { kind: "Note", state: "Repeated" }, ...selection("example-folder/shared-item", "选择示例文件夹中的共享项目") },
+      { key: "example-folder/draft-note", content: draftContent, cells: { kind: "Draft", state: "Editable" }, ...selection("example-folder/draft-note", "选择草稿笔记") },
     ]),
-    folder("another-folder", "Another folder", [
-      { key: "another-folder/shared-item", content: "Shared item", cells: { kind: "Note", state: "Repeated" }, ...selection("another-folder/shared-item", "Select Shared item in Another folder") },
+    folder("another-folder", "另一个文件夹", [
+      { key: "another-folder/shared-item", content: "Shared item", cells: { kind: "Note", state: "Repeated" }, ...selection("another-folder/shared-item", "选择另一个文件夹中的共享项目") },
     ]),
   ];
   const viewport = example(body, "tree");
@@ -68,14 +68,14 @@ export function mountTreeDemo(ui: PluginUi, body: HTMLElement, life: Scope): voi
   const minimum = element("div"); minimum.style.minWidth = "36rem";
   viewport.append(minimum);
   tree = life.widget(ui.mountTree(minimum, {
-    label: "Directory example", header: "Name", rows: rows(), columns: [
+    label: "目录示例", header: "Name", rows: rows(), columns: [
       { key: "kind", header: "Kind", width: 56 },
       { key: "state", header: "State", width: 80 },
     ],
   }, { signal: life.signal }));
   function render() {
     tree.update({ rows: rows() });
-    toggle.update({ label: selectionEnabled ? "Disable selection" : "Enable selection" });
+    toggle.update({ label: selectionEnabled ? "禁用选择" : "启用选择" });
     show({ selectionEnabled, selectedOccurrenceKeys: [...selectedOccurrenceKeys], expanded: { ...expanded }, draft, lastCallback });
   }
   render();

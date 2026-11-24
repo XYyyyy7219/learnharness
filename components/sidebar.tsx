@@ -225,11 +225,11 @@ export function SidebarToggle() {
 				open ? "w-0 -mr-3" : "w-9 mr-0 lh-closed-toggle",
 			)}
 		>
-			<Hint label="Open sidebar" action="toggle-sidebar">
+			<Hint label="打开侧边栏" action="toggle-sidebar">
 			<Button
 				variant="ghost"
 				size="icon"
-				aria-label="Open sidebar"
+				aria-label="打开侧边栏"
 				aria-hidden={open}
 				tabIndex={open ? -1 : 0}
 				onClick={toggle}
@@ -270,13 +270,13 @@ function SessionStatus({ busy }: { busy: boolean }) {
  *  — trivial, a format function swap). Pure — exported for tests. */
 export function timeAgo(iso: string, now = new Date()): string {
 	const ms = now.getTime() - new Date(iso).getTime();
-	if (ms < 60_000) return "just now";
+	if (ms < 60_000) return "刚刚";
 	const min = Math.floor(ms / 60_000);
-	if (min < 60) return `${min}m ago`;
+	if (min < 60) return `${min} 分钟前`;
 	const h = Math.floor(min / 60);
-	if (h < 24) return `${h}h ago`;
+	if (h < 24) return `${h} 小时前`;
 	const d = Math.floor(h / 24);
-	if (d < 7) return `${d}d ago`;
+	if (d < 7) return `${d} 天前`;
 	const date = new Date(iso);
 	const mm = String(date.getMonth() + 1).padStart(2, "0");
 	const dd = String(date.getDate()).padStart(2, "0");
@@ -289,10 +289,10 @@ export function timeAgo(iso: string, now = new Date()): string {
  *  still rides the API payload, so this is a one-line flip back if it's
  *  ever wanted. */
 function sessionMeta(chat: ChatListItem): string {
-	if (chat.compacting) return `Compacting context · ${timeAgo(chat.updatedAt)}`;
-	if (chat.pendingQuestion) return `Waiting for input · ${timeAgo(chat.updatedAt)}`;
+	if (chat.compacting) return `正在压缩上下文 · ${timeAgo(chat.updatedAt)}`;
+	if (chat.pendingQuestion) return `等待输入 · ${timeAgo(chat.updatedAt)}`;
 	if ((chat.kind ?? "teach") === "practice" && chat.pendingProblem) {
-		return `Problem waiting · ${timeAgo(chat.updatedAt)}`;
+		return `等待答题 · ${timeAgo(chat.updatedAt)}`;
 	}
 	if (chat.busy) return "Working…";
 	return timeAgo(chat.updatedAt);
@@ -348,7 +348,7 @@ export function SessionRow({
 			    was left of the name; right-aligned keeps the titles flush with
 			    the teaching rows and reads cleaner. */}
 			{(chat.kind ?? "teach") === "practice" && (
-				<DumbbellIcon className="size-3.5 shrink-0 text-muted-foreground/70" aria-label="Practice session" />
+				<DumbbellIcon className="size-3.5 shrink-0 text-muted-foreground/70" aria-label="练习会话" />
 			)}
 		</button>
 	);
@@ -398,7 +398,7 @@ export function RenameRow({ chat, onCommit, onCancel, depth = 0, compact = false
 							onCancel();
 						}
 					}}
-					aria-label="Rename session"
+					aria-label="重命名会话"
 					data-testid="session-rename-input"
 					className={cn("w-full min-w-0 truncate border-0 border-b border-border bg-transparent px-0 text-foreground outline-none", compact ? sidebarNameFont(true) : "lh-input")}
 				/>
@@ -841,23 +841,23 @@ function SessionsSidebar() {
 						// of the logo, carrying its real shortcut: ⌘G jumps to
 						// the graph view (keyboard-shortcuts routes it to "/",
 						// the same destination as this logo).
-						label="Home"
+						label="首页"
 						action="jump-graph"
 						side="right"
 					>
 						<Link
 							href="/"
-							aria-label="Home"
+							aria-label="首页"
 							className="lh-no-drag flex size-9 shrink-0 items-center justify-center rounded-md transition-colors hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50"
 						>
 							<LhMark className="size-6" />
 						</Link>
 					</Hint>
-					<Hint label="Close sidebar" action="toggle-sidebar">
+					<Hint label="关闭侧边栏" action="toggle-sidebar">
 						<Button
 							variant="ghost"
 							size="icon"
-							aria-label="Close sidebar"
+							aria-label="关闭侧边栏"
 							onClick={toggle}
 							className="lh-no-drag"
 						>
@@ -871,30 +871,30 @@ function SessionsSidebar() {
 					<button
 						type="button"
 						data-testid="new-session"
-						title="Teaching"
+						title="教学"
 						onClick={() => void newSession()}
 						className="flex min-w-0 w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
 					>
 						<PlusIcon className="size-3 shrink-0" />
-						<span className="min-w-0 truncate">Teaching</span>
-						<span className="sr-only">create a new teaching session</span>
+						<span className="min-w-0 truncate">教学</span>
+						<span className="sr-only">新建教学会话</span>
 					</button>
 					<button
 						type="button"
 						data-testid="new-session-practice"
-						title="Practice"
+						title="练习"
 						onClick={() => router.push("/chat/new?mode=practice")}
 						className="flex min-w-0 w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
 					>
 						<DumbbellIcon className="size-3 shrink-0" />
-						<span className="min-w-0 truncate">Practice</span>
-						<span className="sr-only">create a new practice session</span>
+						<span className="min-w-0 truncate">练习</span>
+						<span className="sr-only">新建练习会话</span>
 					</button>
 				</PluginSidebarActions>
 
 				<div className="mx-3 mb-2 flex items-center gap-2">
-					<span className="text-xs uppercase tracking-widest text-muted-foreground/70">Sessions</span>
-					<Hint label="Search sessions" action="sessions-search" side="bottom">
+					<span className="text-xs uppercase tracking-widest text-muted-foreground/70">会话</span>
+					<Hint label="搜索会话" action="sessions-search" side="bottom">
 					<span className="relative flex-1">
 						<Input
 							ref={searchRef}
@@ -946,18 +946,18 @@ function SessionsSidebar() {
 									e.currentTarget.blur();
 								}
 							}}
-							placeholder="Search…"
-							aria-label="Search sessions"
+							placeholder="搜索…"
+							aria-label="搜索会话"
 							className="h-6 rounded-sm border-border bg-background pl-6 text-xs placeholder:text-muted-foreground/60"
 						/>
 						<SearchIcon className="pointer-events-none absolute left-1.5 top-1/2 size-3 -translate-y-1/2 text-muted-foreground/70" />
 					</span>
 					</Hint>
 					{organization && (
-						<Hint label="Add folder" side="bottom">
+						<Hint label="添加文件夹" side="bottom">
 							<button
 								type="button"
-								aria-label="Add folder"
+								aria-label="添加文件夹"
 								data-testid="sidebar-add-folder"
 								onClick={() => setCreatingFolder({ parentId: null })}
 								className="flex size-6 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
@@ -990,7 +990,7 @@ function SessionsSidebar() {
 									: "text-muted-foreground hover:text-foreground",
 							)}
 						>
-							{f === "teach" ? "Teaching" : f === "all" ? "All" : "Practice"}
+							{f === "teach" ? "教学" : f === "all" ? "全部" : "练习"}
 						</button>
 					))}
 				</div>
@@ -999,7 +999,7 @@ function SessionsSidebar() {
 				{folderFailure && (
 					<div role="alert" data-testid="sidebar-folder-error" className="mx-3 mt-2 flex items-start gap-2 text-xs text-error">
 						<span className="min-w-0 flex-1">{folderFailure}</span>
-						<button type="button" onClick={clearFolderFailure} className="shrink-0 text-muted-foreground hover:text-foreground">Dismiss</button>
+						<button type="button" onClick={clearFolderFailure} className="shrink-0 text-muted-foreground hover:text-foreground">关闭</button>
 					</div>
 				)}
 
@@ -1016,15 +1016,15 @@ function SessionsSidebar() {
 						</div>
 					)}
 					{rows === null ? (
-						<div className="px-4 py-4 text-xs text-muted-foreground">Loading…</div>
+						<div className="px-4 py-4 text-xs text-muted-foreground">正在加载…</div>
 					) : rows.length === 0 && (
 						<div className="px-4 py-4 text-xs text-muted-foreground">
-							{query.trim() ? "No sessions match." : "No sessions yet."}
+							{query.trim() ? "没有匹配的会话。" : "暂无会话。"}
 						</div>
 					)}
 					{/* Empty space below the list: drop here to move out of all folders. */}
 					{organization && (
-						<div data-testid="sidebar-root-drop" aria-label="Move outside folders" data-drop-active={folderDrop.dropTarget === null}
+						<div data-testid="sidebar-root-drop" aria-label="移出文件夹" data-drop-active={folderDrop.dropTarget === null}
 							className={cn("min-h-16 flex-1 transition-colors", folderDrop.dropTarget === null && "bg-accent/30")}
 							{...folderDrop.dropProps(null)} />
 					)}
@@ -1041,7 +1041,7 @@ function SessionsSidebar() {
 					    New session — quiet, bottom-pinned, opens the centered
 					    dialog (also mod+, in the keyboard registry). */}
 					<div className="px-3 pb-3 pt-1">
-						<Hint label="Settings" action="open-settings" side="right">
+						<Hint label="设置" action="open-settings" side="right">
 							<button
 								type="button"
 								onClick={() => openSettings()}
@@ -1049,7 +1049,7 @@ function SessionsSidebar() {
 								className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
 							>
 								<SettingsIcon className="size-3" />
-								Settings
+								设置
 							</button>
 						</Hint>
 					</div>
@@ -1081,7 +1081,7 @@ function SessionsSidebar() {
 							}}
 							className="flex items-center rounded-lg px-2.5 py-1.5 text-left text-foreground transition-colors hover:bg-accent"
 						>
-							Rename
+							重命名
 						</button>
 						{/* Export as Markdown (owner, release polish 2026-10-06): the
 					    session-markdown engine's user-facing debut — same-origin
@@ -1103,7 +1103,7 @@ function SessionsSidebar() {
 							}}
 							className="flex items-center rounded-lg px-2.5 py-1.5 text-left text-foreground transition-colors hover:bg-accent"
 						>
-							Export as Markdown…
+							导出为 Markdown…
 						</button>
 						<button
 							type="button"
@@ -1115,7 +1115,7 @@ function SessionsSidebar() {
 							}}
 							className="flex items-center rounded-lg px-2.5 py-1.5 text-left text-muted-foreground/80 transition-colors hover:bg-accent hover:text-foreground"
 						>
-							Delete…
+							删除…
 						</button>
 						<div className="my-0.5 border-t border-border/60" aria-hidden="true" />
 						<CoverageMenuBlock chatId={ctxChatId} />
@@ -1138,7 +1138,7 @@ function SessionsSidebar() {
 							onClick={() => { setRenamingFolderId(ctxFolderId); setCtxFolderId(null); }}
 							className="flex items-center rounded-lg px-2.5 py-1.5 text-left text-foreground transition-colors hover:bg-accent"
 						>
-							Rename
+							重命名
 						</button>
 						<button
 							type="button"
@@ -1152,7 +1152,7 @@ function SessionsSidebar() {
 							}}
 							className="flex items-center rounded-lg px-2.5 py-1.5 text-left text-foreground transition-colors hover:bg-accent"
 						>
-							New subfolder
+							新建子文件夹
 						</button>
 						<button
 							type="button"
@@ -1160,7 +1160,7 @@ function SessionsSidebar() {
 							onClick={() => deleteFolder(ctxFolderId)}
 							className="flex items-center rounded-lg px-2.5 py-1.5 text-left text-muted-foreground/80 transition-colors hover:bg-accent hover:text-foreground"
 						>
-							Delete
+							删除
 						</button>
 					</MenuShell>
 				)}

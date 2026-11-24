@@ -1,10 +1,10 @@
 {
   "apiVersion": 1,
   "id": "ui-showcase",
-  "name": "UI Showcase",
+  "name": "界面展示",
   "version": "0.1.0",
   "minAppVersion": "0.4.1",
-  "description": "An ephemeral gallery of public host UI controls, local callbacks, and native session surfaces. Requires the current feature/plugin-architecture UI APIs.",
+  "description": "展示宿主的公开界面控件、本地回调和会话面板，需要当前插件界面 API。",
   "main": "main.js",
   "styles": "styles.css"
 }

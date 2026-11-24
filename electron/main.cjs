@@ -619,47 +619,47 @@ function installMenu() {
 		{
 			label: app.name,
 			submenu: [
-				{ role: "about" },
+				{ role: "about", label: "关于 LearnHarness" },
 				// Manual checks report their result in Settings → General.
-				{ label: "Check for Updates…", click: () => checkForUpdatesFromMenu() },
+				{ label: "检查更新…", click: () => checkForUpdatesFromMenu() },
 				{ type: "separator" },
-				{ role: "hide" },
-				{ role: "hideOthers" },
+				{ role: "hide", label: "隐藏 LearnHarness" },
+				{ role: "hideOthers", label: "隐藏其他应用" },
 				{ type: "separator" },
-				{ role: "quit" },
+				{ role: "quit", label: "退出 LearnHarness" },
 			],
 		},
-		{ label: "Edit", submenu: [{ role: "undo" }, { role: "redo" }, { type: "separator" }, { role: "cut" }, { role: "copy" }, { role: "paste" }, { role: "selectAll" }] },
+		{ label: "编辑", submenu: [{ role: "undo", label: "撤销" }, { role: "redo", label: "重做" }, { type: "separator" }, { role: "cut", label: "剪切" }, { role: "copy", label: "复制" }, { role: "paste", label: "粘贴" }, { role: "selectAll", label: "全选" }] },
 		{
-			label: "View",
+			label: "查看",
 			submenu: [
-				{ role: "reload" },
-				{ role: "toggleDevTools" },
+				{ role: "reload", label: "重新加载" },
+				{ role: "toggleDevTools", label: "开发者工具" },
 				{ type: "separator" },
 				// OWNED zoom (see applyZoom): the roles change zoomLevel
 				// silently; these broadcast the factor and re-seat the
 				// traffic lights. The renderer's --lh-zoom depends on
 				// hearing every change.
 				{
-					label: "Actual Size",
+					label: "实际大小",
 					accelerator: "CommandOrControl+0",
 					click: () => applyZoom(BrowserWindow.getAllWindows()[0], 1),
 				},
 				{
-					label: "Zoom In",
+					label: "放大",
 					accelerator: "CommandOrControl+Plus",
 					click: () => zoomStep(BrowserWindow.getAllWindows()[0], +1),
 				},
 				{
-					label: "Zoom Out",
+					label: "缩小",
 					accelerator: "CommandOrControl+-",
 					click: () => zoomStep(BrowserWindow.getAllWindows()[0], -1),
 				},
 				{ type: "separator" },
-				{ role: "togglefullscreen" },
+				{ role: "togglefullscreen", label: "切换全屏" },
 			],
 		},
-		{ role: "windowMenu" },
+		{ role: "windowMenu", label: "窗口" },
 	];
 	Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }
@@ -702,6 +702,8 @@ async function main() {
 		chatgpt = createChatGPT({
 			store: fileStore(path.join(app.getPath("userData"), "chatgpt-credentials.json")),
 			openExternal: (target) => shell.openExternal(target),
+			// Use Chromium’s configured network path without attaching browser cookies.
+			fetch: (target, options) => session.defaultSession.fetch(target, { ...options, credentials: "omit" }),
 			onChange: (value) => {
 				chatgptChild?.send(value);
 				for (const win of BrowserWindow.getAllWindows()) win.webContents.send("lh:chatgpt:changed");

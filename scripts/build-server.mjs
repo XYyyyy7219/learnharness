@@ -99,6 +99,22 @@ for (const extra of ["plugins", "dist", path.join("node_modules", "electron")]) 
 	}
 }
 
+// Windows installers dereference Next's external Shiki link. Keep the
+// nested Shiki dependencies reachable from its copied entry at runtime.
+if (process.platform === "win32") {
+	const modules = path.join(STANDALONE, "node_modules");
+	const nested = path.join(modules, "@streamdown", "code", "node_modules", "@shikijs");
+	const top = path.join(modules, "@shikijs");
+	if (exists(nested)) {
+		fs.mkdirSync(top, { recursive: true });
+		for (const name of ["core", "engine-javascript", "engine-oniguruma", "langs", "themes", "types"]) {
+			const from = path.join(nested, name);
+			const to = path.join(top, name);
+			if (exists(from) && !exists(to)) copyTree(from, to);
+		}
+	}
+}
+
 // 3) Sanity: the runtime-read prompt assets must be present (the teacher
 //    agent reads them from disk at request time).
 for (const asset of [

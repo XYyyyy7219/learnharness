@@ -43,10 +43,10 @@ export function ProbeDoneCard({ part }: { part: { input?: unknown; output?: unkn
 
 	const heading = <>
 		<ClipboardCheckIcon className="size-3.5 text-primary" />
-		<span className="min-w-0 truncate">Probe assessment</span>
+		<span className="min-w-0 truncate">摸底评估</span>
 	</>;
 	const note = output && !output.ok ? <>
-		The prober retried: {output.error}
+		摸底老师已重试 {output.error}
 	</> : state === "output-error" ? "The assessment was malformed — the prober retried with a corrected one."
 		: !strands ? "Writing the assessment…" : null;
 

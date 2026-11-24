@@ -36,9 +36,9 @@ import { SettingsRow } from "./controls.tsx";
 import { coreShortcutBindings, pluginShortcutScopeLabel, useKeymapRevision, usePluginShortcutRows } from "../plugin-shortcuts";
 
 const SCOPES: { scope: KeyScope; label: string }[] = [
-	{ scope: "global", label: "Global" },
-	{ scope: "chat", label: "Chat" },
-	{ scope: "graph", label: "Graph" },
+	{ scope: "global", label: "全局" },
+	{ scope: "chat", label: "对话" },
+	{ scope: "graph", label: "图谱" },
 ];
 
 /** The overrides map after ONE change (pure — exported for tests):
@@ -132,12 +132,12 @@ export function KeyboardSection() {
 									<SettingsRow
 										key={def.id}
 										label={def.label}
-										hint={def.displayOnly ? "Fixed — part of this screen" : undefined}
+										hint={def.displayOnly ? "固定快捷键，适用于当前页面" : undefined}
 										testid={`kbd-row-${def.id}`}
 									>
 										<span className="flex items-center gap-2">
 											<kbd className="rounded-sm border border-border bg-muted px-1.5 py-0.5 font-ui text-xs">
-												{rebinding === def.id ? "Press keys…" : formatBinding(effective)}
+												{rebinding === def.id ? "按下按键…" : formatBinding(effective)}
 											</kbd>
 											{def.displayOnly ? null : rebinding === def.id ? (
 												<button
@@ -145,7 +145,7 @@ export function KeyboardSection() {
 													onClick={() => setRebinding(null)}
 													className="text-xs text-muted-foreground/70 underline-offset-2 hover:text-foreground hover:underline"
 												>
-													Cancel
+													取消
 												</button>
 											) : (
 												<>
@@ -155,7 +155,7 @@ export function KeyboardSection() {
 														data-testid={`kbd-rebind-${def.id}`}
 														className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
 													>
-														Rebind
+														重新绑定
 													</button>
 													{overridden(def.id) && (
 														<button
@@ -164,7 +164,7 @@ export function KeyboardSection() {
 															data-testid={`kbd-reset-${def.id}`}
 															className="text-xs text-muted-foreground/70 underline-offset-2 hover:text-foreground hover:underline"
 														>
-															Reset
+															重置
 														</button>
 													)}
 												</>
@@ -182,24 +182,24 @@ export function KeyboardSection() {
 				<div className="flex flex-col gap-2">{pluginRows.filter(row => row.pluginId === pluginId).map(row => <SettingsRow key={row.id} label={row.name}
 					hint={`${pluginShortcutScopeLabel(row)}${row.reason ? ` · Inactive: ${row.reason}` : ""}`} testid={`kbd-row-${row.id}`}>
 					<span className="flex items-center gap-2">
-						<kbd className="rounded-sm border border-border bg-muted px-1.5 py-0.5 font-ui text-xs">{rebinding === row.id ? "Press keys…" : row.binding ? formatBinding(row.binding) : "Unbound"}</kbd>
-						{rebinding === row.id ? <button type="button" onClick={() => { setRebinding(null); setRebindError(null); }} className="text-xs text-muted-foreground">Cancel</button> : <>
-							<button type="button" data-testid={`kbd-rebind-${row.id}`} onClick={() => beginRebind(row.id)} className="text-xs text-muted-foreground hover:underline">Rebind</button>
-							{row.binding && <button type="button" data-testid={`kbd-clear-${row.id}`} onClick={() => { saveOverrides(nextOverrides(loadOverrides(), row.id, "")); setNonce(n => n + 1); }} className="text-xs text-muted-foreground hover:underline">Clear</button>}
-							{overrides[row.id] !== undefined && <button type="button" data-testid={`kbd-reset-${row.id}`} onClick={() => { saveOverrides(nextOverrides(loadOverrides(), row.id, null)); setNonce(n => n + 1); }} className="text-xs text-muted-foreground hover:underline">Reset</button>}
+						<kbd className="rounded-sm border border-border bg-muted px-1.5 py-0.5 font-ui text-xs">{rebinding === row.id ? "按下按键…" : row.binding ? formatBinding(row.binding) : "未绑定"}</kbd>
+						{rebinding === row.id ? <button type="button" onClick={() => { setRebinding(null); setRebindError(null); }} className="text-xs text-muted-foreground">取消</button> : <>
+							<button type="button" data-testid={`kbd-rebind-${row.id}`} onClick={() => beginRebind(row.id)} className="text-xs text-muted-foreground hover:underline">重新绑定</button>
+							{row.binding && <button type="button" data-testid={`kbd-clear-${row.id}`} onClick={() => { saveOverrides(nextOverrides(loadOverrides(), row.id, "")); setNonce(n => n + 1); }} className="text-xs text-muted-foreground hover:underline">清除</button>}
+							{overrides[row.id] !== undefined && <button type="button" data-testid={`kbd-reset-${row.id}`} onClick={() => { saveOverrides(nextOverrides(loadOverrides(), row.id, null)); setNonce(n => n + 1); }} className="text-xs text-muted-foreground hover:underline">重置</button>}
 						</>}
 					</span>
 				</SettingsRow>)}</div>
 			</div>)}
 			<div className="mt-1 flex items-center justify-between">
-				<span className="text-xs text-muted-foreground/70">Stored on this device (lh:keymap) — overrides only.</span>
+				<span className="text-xs text-muted-foreground/70">仅将自定义绑定保存在本机（lh:keymap）。</span>
 				<button
 					type="button"
 					onClick={resetAll}
 					data-testid="kbd-reset-all"
 					className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
 				>
-					Reset all to defaults
+					全部恢复默认值
 				</button>
 			</div>
 		</>

@@ -161,7 +161,7 @@ describe("setup polish interactions", () => {
 
 	it("model and thinking dropdowns keep outside-click dismissal and model guidance uses two sentences", async () => {
 		await mount({ keyed: true });
-		assert.equal(element('[data-testid="setup-stage-pickers"] > p').textContent, "Pick the model for each tier. All three are required before chats can start.");
+		assert.equal(element('[data-testid="setup-stage-pickers"] > p').textContent, "请为三个类别分别选择模型。选齐后才能开始对话。");
 		await click(element('[data-testid="setup-trigger-strong"]'));
 		await click(element('[data-testid="setup-dialog"] h2'));
 		assert.equal(document.querySelector('[data-testid="setup-menu-strong"]'), null);
@@ -187,6 +187,6 @@ describe("setup polish interactions", () => {
 
 	it("catalog failure uses the approved two-sentence error", async () => {
 		await mount({ catalogFails: true });
-		assert.ok(element('[data-testid="setup-dialog"]').textContent?.includes("Model catalog could not be loaded. Check the connection and retry."));
+		assert.ok(element('[data-testid="setup-dialog"]').textContent?.includes("无法加载模型目录。请检查连接后重试。"));
 	});
 });

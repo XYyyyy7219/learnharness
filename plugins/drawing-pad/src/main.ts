@@ -60,7 +60,7 @@ export async function activate(ctx: PluginFrontendContext): Promise<() => void> 
     open = pad;
     try {
       pad.handle = ctx.ui.openSurface(context.surfaceTarget, {
-        title: "Drawing pad", background: "opaque",
+        title: "画板", background: "opaque",
         content(container, signal) {
           if (pad.closed || signal.aborted) return;
           const mounted = mountSheet(container, ctx, sheets, state, context.view.input, signal);
@@ -89,7 +89,7 @@ export async function activate(ctx: PluginFrontendContext): Promise<() => void> 
     get name() {
       const id = pageSessions.get(ctx.app.pathname());
       const state = id ? sheets.sessions.get(id) : undefined;
-      return state && sheets.pending(state) ? "Draw (unsent)" : "Draw";
+      return state && sheets.pending(state) ? "绘图（未发送）" : "Draw";
     },
     run(context) { if (context.surface === "session") toggle(context); },
   };
@@ -118,15 +118,15 @@ export async function activate(ctx: PluginFrontendContext): Promise<() => void> 
     run(context) { editingPad(context)?.selectHand(); },
   };
   const rows = (value: Settings): PluginSettingsSchema["rows"] => [...([
-    { key: "darkInkColor", label: "Dark mode ink color" },
-    { key: "lightInkColor", label: "Light mode ink color" },
+    { key: "darkInkColor", label: "深色模式墨水颜色" },
+    { key: "lightInkColor", label: "浅色模式墨水颜色" },
   ] as const).map(({ key, label }) => ({
     key, type: "text" as const, label, value: value[key],
-    description: "Six-digit hex color. Recolors all unsent ink when this app theme mode is active.", validate: colorError,
+    description: "输入六位十六进制颜色。当此主题模式启用时，会为所有未发送的笔迹重新着色。", validate: colorError,
     async onChange(color: string) { applySettings(await ctx.call("set-ink-color", { [key]: color })); },
   })), {
-    key: "imageScale", type: "number", label: "Image scale", value: value.imageScale, min: 0, max: 100,
-    description: "Export percentage (default 50%). Applied before the fixed 2000 × 2000 pixel cap. Does not change the drawing surface.",
+    key: "imageScale", type: "number", label: "图片缩放", value: value.imageScale, min: 0, max: 100,
+    description: "导出百分比（默认 50%）。缩放后仍受 2000 × 2000 像素上限约束，不影响画板本身。",
     validate: imageScaleError,
     async onChange(imageScale) { applySettings(await ctx.call("set-image-scale", { imageScale })); },
   }];
@@ -177,7 +177,7 @@ export async function activate(ctx: PluginFrontendContext): Promise<() => void> 
     if (disposed || sheets.sessions.get(state.id) !== state || ticket !== state.readTicket) return;
     sheets.observePoses(state, parsePoseResponse(value, state.id));
   }
-  const report = (error: unknown) => { if (!disposed && !ctx.signal.aborted) console.error("Drawing Pad resync failed; retaining existing work.", error); };
+  const report = (error: unknown) => { if (!disposed && !ctx.signal.aborted) console.error("画板重新同步失败，现有笔迹已保留。", error); };
   const dispose = () => {
     if (disposed) return;
     disposed = true;

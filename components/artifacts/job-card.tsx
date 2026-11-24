@@ -60,12 +60,12 @@ export function PdfBriefCard({ output }: { output: unknown }) {
 			</div>
 			{!failed && readList.length > 0 && (
 				<div className="mt-3 border-t pt-2 text-xs text-muted-foreground">
-					Pages read: {readList.join(", ")}
+					已阅读的页面 {readList.join(", ")}
 				</div>
 			)}
 			{!failed && consultedList.length > readList.length && (
 				<div className="mt-3 border-t pt-2 text-xs text-muted-foreground">
-					Pages consulted: {consultedList.join(", ")}
+					已查阅的页面 {consultedList.join(", ")}
 				</div>
 			)}
 		</div>
@@ -81,7 +81,7 @@ export function ResearchBriefCard({ output }: { output: unknown }) {
 	if (!result || typeof result.brief !== "string") {
 		return (
 			<div className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
-				Research completed, but the result could not be displayed.
+				研究已完成，但无法显示结果。
 			</div>
 		);
 	}
@@ -89,7 +89,7 @@ export function ResearchBriefCard({ output }: { output: unknown }) {
 	return (
 		<div className="rounded-xl border bg-card p-4 text-card-foreground" data-testid="research-brief-card">
 			<div className="mb-1 flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-				Research brief
+				研究摘要
 				{failed && <span className="rounded bg-error/15 px-1.5 py-0.5 text-error">failed</span>}
 			</div>
 			<div className="text-sm [&_p:first-child]:mt-0 [&_p:last-child]:mb-0">
@@ -97,7 +97,7 @@ export function ResearchBriefCard({ output }: { output: unknown }) {
 			</div>
 			{result.sources.length > 0 && (
 				<div className="mt-3 border-t pt-2">
-					<div className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">Sources</div>
+					<div className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">来源</div>
 					<ul className="flex flex-col gap-0.5 text-xs">
 						{result.sources.map((s) => (
 							<li key={s.url} className="truncate">

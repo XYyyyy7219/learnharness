@@ -112,14 +112,14 @@ export function StartupMessage() {
 		frame={<div className="mx-4 flex max-h-[85vh] w-full max-w-xl flex-col overflow-hidden rounded-md border border-border bg-card text-card-foreground shadow-xl" />}>
 		<header className="flex min-h-15 shrink-0 items-center gap-3 border-b border-border px-5 py-3">
 			<h2 id={headingId} className="min-w-0 break-words font-title text-2xl tracking-tight">{open.message.title}</h2>
-			<Button type="button" aria-label="Close announcement" variant="ghost" size="icon-xs"
+			<Button type="button" aria-label="关闭公告" variant="ghost" size="icon-xs"
 				className="ml-auto size-7 rounded-sm text-muted-foreground hover:text-foreground" onClick={dismiss}>
 				<XIcon aria-hidden="true" className="size-3.5" />
 			</Button>
 		</header>
 		<div className="min-h-0 overflow-y-auto break-words p-5"><StartupMessageBody markdown={open.message.bodyMarkdown} /></div>
 		<footer className="flex shrink-0 justify-end border-t border-border px-5 py-3">
-			<Button type="button" variant="outline" size="sm" className="font-ui" onClick={dismiss}>Close</Button>
+			<Button type="button" variant="outline" size="sm" className="font-ui" onClick={dismiss}>关闭</Button>
 		</footer>
 	</HostDialog>;
 }

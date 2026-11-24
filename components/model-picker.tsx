@@ -153,7 +153,7 @@ export function ModelControl({ chatId, onModelChange }: { chatId?: string; onMod
 				});
 				if (!res.ok) {
 					const body = (await res.json().catch(() => ({}))) as { error?: string };
-					setError(body.error ?? `settings rejected (${res.status})`);
+					setError(body.error ?? `设置未被接受（${res.status}）`);
 					return;
 				}
 				// Server truth, never the request body (fix wave): a pick
@@ -166,7 +166,7 @@ export function ModelControl({ chatId, onModelChange }: { chatId?: string; onMod
 				setOpen(null);
 				notifySettingsSaved("models");
 			} catch {
-				setError("Could not reach the server — try again.");
+				setError("无法连接服务器，请重试。");
 			}
 		},
 		[],
@@ -188,14 +188,14 @@ export function ModelControl({ chatId, onModelChange }: { chatId?: string; onMod
 				});
 				if (!res.ok) {
 					const body = (await res.json().catch(() => ({}))) as { error?: string };
-					setError(body.error ?? `settings rejected (${res.status})`);
+					setError(body.error ?? `设置未被接受（${res.status}）`);
 					return;
 				}
 				const stored = (await res.json().catch(() => null)) as { settings?: ChatSettings } | null;
 				setSession({ settings: stored?.settings ?? next });
 				setOpen(null);
 			} catch {
-				setError("Could not reach the server — try again.");
+				setError("无法连接服务器，请重试。");
 			}
 		},
 		[chatId],
@@ -273,7 +273,7 @@ export function ModelControl({ chatId, onModelChange }: { chatId?: string; onMod
 	return (
 		<div ref={containerRef} className="relative flex items-center gap-1.5" data-testid="model-control">
 			<Hint
-				label={effectiveId ? `${effectiveProvider ? `${effectiveProvider}:` : ""}${effectiveId}` : "Model selector"}
+				label={effectiveId ? `${effectiveProvider ? `${effectiveProvider}:` : ""}${effectiveId}` : "模型选择器"}
 				action="open-model-picker"
 				side="bottom"
 			>
@@ -287,7 +287,7 @@ export function ModelControl({ chatId, onModelChange }: { chatId?: string; onMod
 				// "Thinking" + its real shortcut via the registry (owner interlude
 				// 2026-09-25): ⇧⇥ cycles the level, so "Thinking (⇧⇥)" —
 				// rebind-live like every Hint suffix.
-				label="Thinking"
+				label="思考"
 				action="cycle-thinking"
 				side="bottom"
 			>

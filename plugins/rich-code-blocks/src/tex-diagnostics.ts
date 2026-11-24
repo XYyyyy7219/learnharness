@@ -34,5 +34,5 @@ export function texErrorMessage(error: unknown, source: string): string {
   // it to saved source when the engine's actual excerpt agrees with that line.
   const agrees = originalLine && excerpt && originalLine.replace(/\s+/g, " ").includes(excerpt.replace(/\s+/g, " "));
   const context = agrees ? ` Line ${lineNumber}: ${originalLine.slice(0, 400)}` : "";
-  return boundTexError(`TeX compilation failed: ${details.join(" ")}${context}`);
+  return boundTexError(`TeX 编译失败：${details.join(" ")}${context}`);
 }

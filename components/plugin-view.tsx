@@ -28,20 +28,20 @@ export function PluginViewScreen({ pluginId, viewId }: { pluginId: string; viewI
 	const unavailable = !plugin ? "Plugin is not installed." : !plugin.info.enabled ? "This plugin is disabled." : "This plugin view is not available.";
 	return <div className="flex h-dvh min-w-0 flex-col">
 		<TopBar>
-			<h1 data-plugin-chrome-title className="min-w-0 truncate font-title text-3xl tracking-tight">{view?.name ?? plugin?.info.manifest?.name ?? "Plugin"}</h1>
+			<h1 data-plugin-chrome-title className="min-w-0 truncate font-title text-3xl tracking-tight">{view?.name ?? plugin?.info.manifest?.name ?? "插件"}</h1>
 			<div className="min-w-4 flex-1" aria-hidden="true" />
 			<PluginTopBarActions context={{ placement: "top-bar", surface: "plugin-view", pluginId, viewId }} />
-			<Hint label="Plugin settings" side="bottom">
-				<Button variant="ghost" size="icon" aria-label="Plugin settings" title="Plugin settings" className="shrink-0" onClick={() => open(`plugin:${pluginId}`)}><SettingsIcon className="size-4" /></Button>
+			<Hint label="插件设置" side="bottom">
+				<Button variant="ghost" size="icon" aria-label="插件设置" title="插件设置" className="shrink-0" onClick={() => open(`plugin:${pluginId}`)}><SettingsIcon className="size-4" /></Button>
 			</Hint>
 		</TopBar>
 		<div ref={bodyRef} className="relative flex min-h-0 min-w-0 flex-1 flex-col">
 			<div data-plugin-view-scroll="" className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
 				{snapshot.error && <p role="alert" className="px-5 py-3 text-xs text-destructive">{snapshot.error}</p>}
 				{plugin?.error && <p role="alert" className="px-5 py-3 text-xs text-destructive">{plugin.error}</p>}
-				{loading ? <p role="status" className="px-5 py-4 text-xs text-muted-foreground">Loading plugin…</p>
+				{loading ? <p role="status" className="px-5 py-4 text-xs text-muted-foreground">正在加载插件…</p>
 					: view && plugin?.info.enabled ? <PluginMountPoint key={`${pluginId}/${viewId}/${plugin.info.revision}`} pluginId={pluginId} mount={view.mount} label={view.name} />
-						: <div className="px-5 py-4 text-sm text-muted-foreground"><p>{unavailable}</p><Link href="/" className="mt-3 inline-block underline">Back to home</Link></div>}
+						: <div className="px-5 py-4 text-sm text-muted-foreground"><p>{unavailable}</p><Link href="/" className="mt-3 inline-block underline">返回首页</Link></div>}
 			</div>
 			<SurfaceRegion target={surfaceTarget} />
 		</div>

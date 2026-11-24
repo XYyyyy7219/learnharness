@@ -127,6 +127,42 @@ for (const [label, claims] of [["nonce", { nonce: "wrong" }], ["issuer", { iss: 
 	});
 }
 
+test("rejected code exchanges distinguish region, authorization, and one-time grant failures", async () => {
+	const cases = [
+		{ status: 403, error: { code: "unsupported_country_region_territory" }, message: /当前网络地区不受支持/ },
+		{ status: 403, error: "access_denied", message: /拒绝了 ChatGPT 授权/ },
+		{ status: 401, error: { code: "invalid_client" }, message: /拒绝了 ChatGPT 授权/ },
+		{ status: 400, error: "invalid_grant", message: /拒绝了本次一次性登录/ },
+	];
+	for (const { status, error, message } of cases) {
+		const f = fixture({ token: async () => Response.json({ error, error_description: "mock details must stay private" }, { status }) });
+		try {
+			await f.service.login();
+			assert.equal((await f.callback()).status, 200);
+			await f.changed.promise;
+			const result = await f.service.status();
+			assert.match(result.error, message);
+			assert.doesNotMatch(result.error, /mock details|会话已过期/);
+			assert.equal(f.saved.activeId, null);
+			assert.equal(f.writeCount, 0);
+		} finally { f.service.close(); }
+	}
+});
+
+test("a region rejection when retrieving signing keys cannot activate a login", async () => {
+	const f = fixture({ provider: async (target) => target.endsWith("/jwks.json")
+		? Response.json({ error: { code: "unsupported_country_region_territory" } }, { status: 403 })
+		: undefined });
+	try {
+		await f.service.login();
+		await f.callback();
+		await f.changed.promise;
+		assert.match((await f.service.status()).error, /当前网络地区不受支持/);
+		assert.equal(f.saved.activeId, null);
+		assert.equal(f.writeCount, 0);
+	} finally { f.service.close(); }
+});
+
 test("cancel and timeout close the listener without exchanging or replacing an active account", async () => {
 	const f = fixture({ timeoutMs: 30 });
 	try {
@@ -441,7 +477,7 @@ test("scope-disabled credentials remain revocable and unconfirmed revoke never c
 	try {
 		await assert.rejects(f.service.lease(false));
 		const status = await f.service.logout(f.saved.activeId);
-		assert.equal(status.error, "Account disconnected locally. Remote revocation could not be confirmed.");
+		assert.equal(status.error, "已断开本地账号。无法确认服务端是否已撤销授权。");
 		assert.equal(f.requests.filter((r) => r.form?.get("token") === "scope-disabled-refresh").length, 2);
 		assert.equal(f.saved.registrations[0].tokens, undefined);
 	} finally { f.service.close(); }
@@ -574,12 +610,12 @@ test("signed-out legacy registrations can be explicitly forgotten; failed revoca
 		const status = await f.service.status(); assert.equal(status.accounts.length, 1); assert.equal(status.accounts[0].connected, false);
 		const result = await f.service.disconnect(status.accounts[0].id);
 		assert.equal(result.accounts.length, 0); assert.equal(result.activeId, null); assert.equal(f.saved.registrations.length, 0);
-		assert.equal(result.error, "Account disconnected locally. Remote revocation could not be confirmed.");
+		assert.equal(result.error, "已断开本地账号。无法确认服务端是否已撤销授权。");
 	} finally { f.service.close(); }
 	const unconfirmed = await loggedIn({ provider: async (url) => url.endsWith("/revoke") ? new Response(null, { status: 400 }) : undefined });
 	try {
 		const result = await unconfirmed.service.disconnect(unconfirmed.saved.activeId);
-		assert.equal(result.error, "Account disconnected locally. Remote revocation could not be confirmed."); assert.deepEqual(unconfirmed.saved.registrations, []);
+		assert.equal(result.error, "已断开本地账号。无法确认服务端是否已撤销授权。"); assert.deepEqual(unconfirmed.saved.registrations, []);
 		assert.equal(unconfirmed.saved.activeId, null); assert.equal(JSON.stringify(unconfirmed.saved).includes("scratch-refresh"), false);
 	} finally { unconfirmed.service.close(); }
 });

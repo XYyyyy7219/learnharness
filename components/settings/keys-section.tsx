@@ -152,7 +152,7 @@ export function providerKeyLabel(id: string, providers: readonly ProviderKeyInfo
 /** The minimal status line, e.g. "…ab12 · 64 chars" (" · env" marks an
  *  environment-owned value — the row itself is read-only then). Pure. */
 export function keyStatusLine(status: AuthKeyStatus): string {
-	if (!status.present || !status.masked) return "not set";
+	if (!status.present || !status.masked) return "未设置";
 	const tail = status.masked.replace(/ \((\d+) chars\)$/, "");
 	const chars = status.masked.match(/\((\d+) chars\)$/)?.[1] ?? "?";
 	return `${tail} · ${chars}${status.source === "env" ? " · env" : ""}`;
@@ -216,8 +216,8 @@ function KeyTableRow({
 						onKeyDown={(e) => {
 							if (e.key === "Enter") void save();
 						}}
-						placeholder="Paste key…"
-						aria-label={`${label} key`}
+						placeholder="粘贴密钥…"
+						aria-label={`${label} 密钥`}
 						data-testid={`${testid}-input`}
 						disabled={busy}
 						autoFocus
@@ -230,7 +230,7 @@ function KeyTableRow({
 						data-testid={`${testid}-save`}
 						className="shrink-0 text-xs text-foreground underline-offset-2 hover:underline disabled:text-muted-foreground/40 disabled:no-underline"
 					>
-						Save
+						保存
 					</button>
 					<button
 						type="button"
@@ -239,7 +239,7 @@ function KeyTableRow({
 						data-testid={`${testid}-cancel`}
 						className="shrink-0 text-xs text-muted-foreground/70 underline-offset-2 hover:text-foreground hover:underline"
 					>
-						Cancel
+						取消
 					</button>
 					{status.present && status.source === "file" && onDelete && (
 						<button
@@ -249,7 +249,7 @@ function KeyTableRow({
 							data-testid={`${testid}-delete`}
 							className="shrink-0 text-xs text-muted-foreground/70 underline-offset-2 hover:text-error hover:underline"
 						>
-							Delete
+							删除
 						</button>
 					)}
 				</div>
@@ -283,7 +283,7 @@ function KeyTableRow({
 							onClick={(e) => e.stopPropagation()}
 							className="text-[10px] text-muted-foreground/60 underline-offset-2 hover:text-foreground hover:underline"
 						>
-							key ↗
+							密钥 ↗
 						</a>
 					)}
 					<span data-testid={`${testid}-status`} className="font-mono text-[11px] text-muted-foreground">
@@ -335,7 +335,7 @@ function AddProviderRow({
 				onClick={() => setOpen((v) => !v)}
 				className="flex w-full items-center justify-between gap-3 rounded-sm px-1 py-1.5 text-left font-ui text-xs text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground"
 			>
-				<span>+ Add a provider</span>
+				<span>+ 添加服务商</span>
 				{addable.length > 0 && <span className="font-mono text-[11px]">{addable.length}</span>}
 			</button>
 			{open && (
@@ -441,7 +441,7 @@ export function KeysSection({
 		});
 		if (!res.ok) {
 			const body = (await res.json().catch(() => ({}))) as { error?: string };
-			return body.error ?? `Save failed (${res.status})`;
+			return body.error ?? `保存失败（${res.status}）`;
 		}
 		await reload();
 		// The cross-surface keys signal (zero-keys wave): the zero-keys pill,
@@ -461,7 +461,7 @@ export function KeysSection({
 	 *  deleteKey: fire, re-read, broadcast so the catalog narrows everywhere. */
 	async function disconnectCustom(revision: string): Promise<string | null> {
 		const res = await fetch("/api/custom-provider", { method: "DELETE", headers: { "content-type": "application/json", "if-match": revision }, body: JSON.stringify({}) }).catch(() => null);
-		if (!res?.ok) return res ? ((await res.json().catch(() => ({}))).error ?? "Disconnect failed.") : "Disconnect failed. Check your connection.";
+		if (!res?.ok) return res ? ((await res.json().catch(() => ({}))).error ?? "断开连接失败。") : "断开连接失败，请检查网络。";
 		discardCustomEditor();
 		await reload();
 		notifySettingsSaved("keys");
@@ -469,7 +469,7 @@ export function KeysSection({
 	}
 
 	if (loading || statuses === null) {
-		return <p className="px-6 py-5 text-xs text-muted-foreground/70">Loading keys…</p>;
+		return <p className="px-6 py-5 text-xs text-muted-foreground/70">正在加载密钥…</p>;
 	}
 
 	const { providerRows, toolRows, unknownRows, addable } = classifyKeys(statuses, providers);
@@ -485,7 +485,7 @@ export function KeysSection({
 
 	return (
 		<div ref={editorScopeRef} className="contents">
-			<SettingsGroup label="Model API keys" testid="group-provider-keys">
+			<SettingsGroup label="模型 API 密钥" testid="group-provider-keys">
 				{providerRows.map((status) => (
 					<KeyTableRow
 						key={status.id}
@@ -572,15 +572,15 @@ export function KeysSection({
 				</div>}
 			</SettingsGroup>
 
-			<SettingsGroup label="Subscriptions" testid="group-subscriptions">
+			<SettingsGroup label="订阅" testid="group-subscriptions">
 				<SubscriptionConnections />
 			</SettingsGroup>
 
-			<SettingsGroup label="External CLI" testid="group-external-cli">
+			<SettingsGroup label="外部命令行工具" testid="group-external-cli">
 				<ClaudeCodeInstallationStatus />
 			</SettingsGroup>
 
-			{(["Dictation", "Search"] as const).map((label) => <SettingsGroup key={label} label={label} testid={label === "Dictation" ? "group-dictation" : "group-search"}>
+			{(["Dictation", "Search"] as const).map((label) => <SettingsGroup key={label} label={label === "Dictation" ? "语音听写" : "搜索"} testid={label === "Dictation" ? "group-dictation" : "group-search"}>
 				{toolRows.filter((status) => label === "Dictation" ? status.id === "DEEPGRAM_API_KEY" : status.id !== "DEEPGRAM_API_KEY").map((status) => (
 					<KeyTableRow
 						key={status.id}
@@ -602,12 +602,12 @@ export function KeysSection({
 				{label === "Dictation" && <>
 					<DictationLanguageSetting />
 					<p data-testid="dictation-setup-hint" className="px-1 text-[11px] leading-relaxed text-muted-foreground/70">
-						Create a <a
+						创建 <a
 							href="https://console.deepgram.com/"
 							target="_blank"
 							rel="noreferrer"
 							className="underline underline-offset-2 hover:text-foreground"
-						>Deepgram API key</a> with the Member role or higher, then add it above.
+						>Deepgram API 密钥</a> ，授予成员或更高权限，然后添加到上方。
 					</p>
 				</>}
 			</SettingsGroup>)}
@@ -647,8 +647,8 @@ function AddProviderEditor({
 				onKeyDown={(e) => {
 					if (e.key === "Enter" && value.trim()) onSave(value);
 				}}
-				placeholder="Paste key…"
-				aria-label={`${provider.label} key`}
+				placeholder="粘贴密钥…"
+				aria-label={`${provider.label} 密钥`}
 				data-testid={`key-${provider.id}-input`}
 				autoFocus={active}
 				className="h-7 min-w-0 flex-1 rounded-sm border border-border bg-background px-1.5 font-mono text-xs text-foreground outline-none placeholder:text-muted-foreground/60 focus:border-muted-foreground/50"
@@ -660,7 +660,7 @@ function AddProviderEditor({
 				data-testid={`key-${provider.id}-save`}
 				className="shrink-0 text-xs text-foreground underline-offset-2 hover:underline disabled:text-muted-foreground/40 disabled:no-underline"
 			>
-				Save
+				保存
 			</button>
 			<button
 				type="button"
@@ -668,7 +668,7 @@ function AddProviderEditor({
 				data-testid={`key-${provider.id}-cancel`}
 				className="shrink-0 text-xs text-muted-foreground/70 underline-offset-2 hover:text-foreground hover:underline"
 			>
-				Cancel
+				取消
 			</button>
 			{error && (
 				<p role="alert" className="w-full pl-0 text-xs text-error" data-testid={`key-${provider.id}-error`}>
@@ -689,7 +689,7 @@ export function CustomEndpointSetup({ onSaved }: { onSaved: () => void | Promise
 		catch { setError(true); }
 	}
 	useEffect(() => { void reload(); }, []);
-	if (!status || error) return <div className="text-xs">{error ? "Unable to load custom configuration." : "Loading custom configuration…"}{error && <button onClick={() => void reload()}>Retry</button>}</div>;
+	if (!status || error) return <div className="text-xs">{error ? "无法加载自定义配置。" : "正在加载自定义配置…"}{error && <button onClick={() => void reload()}>重试</button>}</div>;
 	return <CustomEndpointEditor key={status.revision} setup revision0={status.revision} authMode0={status.authMode} keySource0={status.keySource} keyReuseRequired0={status.keyReuseRequired} baseUrl0={status.baseUrl} keyPresent={status.keyPresent} models={status.models} overrides={status.overrides} manualModels0={status.manualModels} onSaved={onSaved} onPinsSaved={reload} onReload={reload} onCancel={reload} />;
 }
 
@@ -714,7 +714,7 @@ function CustomEndpointRow({
 				onClick={onToggle}
 				className="flex w-full items-center justify-between gap-3 rounded-sm px-1 py-1.5 text-left cursor-pointer transition-colors hover:bg-accent/50"
 			>
-				<span className="font-ui text-xs text-foreground">Custom endpoint</span>
+				<span className="font-ui text-xs text-foreground">自定义端点</span>
 				<span data-testid="custom-endpoint-status" className="max-w-[60%] truncate font-mono text-[11px] text-muted-foreground">
 					{line}
 				</span>
@@ -822,7 +822,7 @@ function CustomEndpointEditor({
 			setKeyPresent(status.keyPresent);
 			setKeyReuseRequired(status.keyReuseRequired);
 			if (status.keySource === "env") setKey("");
-		}).catch(() => { if (!cancelled) setError("Unable to inspect effective key. Reload configuration and retry."); })
+		}).catch(() => { if (!cancelled) setError("无法检查当前生效的密钥。请重新加载配置后重试。"); })
 			.finally(() => { if (!cancelled) setAuthLoading(false); });
 		return () => { cancelled = true; };
 	}, [authMode]);
@@ -883,7 +883,7 @@ function CustomEndpointEditor({
 		}).catch(() => null);
 		if (!res || !res.ok) {
 			const b = (await res?.json().catch(() => ({}))) as { error?: string } | undefined;
-			setError(res ? (b?.error ?? `Connect failed (${res.status})`) : "Connect failed. Check your connection.");
+			setError(res ? (b?.error ?? `连接失败（${res.status}）`) : "连接失败，请检查网络。");
 			setBusy(false);
 			return;
 		}
@@ -894,14 +894,14 @@ function CustomEndpointEditor({
 	return (
 		<div data-testid="custom-endpoint-editor" className="flex flex-col gap-2 rounded-sm px-1 py-1.5">
 			<div className="flex items-center gap-2">
-				<span className="shrink-0 font-ui text-xs text-foreground">Custom endpoint</span>
+				<span className="shrink-0 font-ui text-xs text-foreground">自定义端点</span>
 				<input
 					ref={baseUrlRef}
 					type="text"
 					value={baseUrl}
 					onChange={(e) => setBaseUrl(e.target.value)}
-					placeholder="Base URL, e.g. http://localhost:11434/v1"
-					aria-label="Custom endpoint base URL"
+					placeholder="基础 URL，例如 http://localhost:11434/v1"
+					aria-label="自定义端点基础 URL"
 					data-testid="custom-baseurl-input"
 					disabled={busy}
 					autoFocus={active}
@@ -912,19 +912,19 @@ function CustomEndpointEditor({
 				type="text"
 				value={manualModels}
 				onChange={(e) => setManualModels(e.target.value)}
-				placeholder="Model IDs, comma-separated — optional, needed when the endpoint has no /models list"
-				aria-label="Custom endpoint model IDs"
+				placeholder="模型 ID，用逗号分隔。端点不提供 /models 时需要填写。"
+				aria-label="自定义端点模型 ID"
 				data-testid="custom-models-input"
 				disabled={busy}
 				className="h-7 min-w-0 rounded-sm border border-border bg-background px-1.5 font-mono text-xs text-foreground outline-none placeholder:text-muted-foreground/60 focus:border-muted-foreground/50"
 			/>
-			<label className="flex items-center gap-2 text-xs">Authentication
-				<select aria-label="Custom endpoint authentication" data-testid="custom-auth-mode" value={authMode} disabled={busy || pinsBusy} onChange={(e) => { setAuthMode(e.target.value as "keyless" | "apiKey"); setReuseKey(false); }}>
-					<option value="keyless">Keyless</option><option value="apiKey">API key</option>
+			<label className="flex items-center gap-2 text-xs">身份验证
+				<select aria-label="自定义端点身份验证" data-testid="custom-auth-mode" value={authMode} disabled={busy || pinsBusy} onChange={(e) => { setAuthMode(e.target.value as "keyless" | "apiKey"); setReuseKey(false); }}>
+					<option value="keyless">无需密钥</option><option value="apiKey">API 密钥</option>
 				</select>
 			</label>
-			{authMode === "apiKey" && keySource === "env" && <p className="text-[11px] text-muted-foreground" data-testid="custom-env-owned">Environment supplies the effective key. Change the environment to replace it.</p>}
-			{authMode === "apiKey" && keyPresent && (changedTarget || keyReuseRequired) && <label className="text-[11px]"><input type="checkbox" data-testid="custom-reuse-key" checked={reuseKey} onChange={(e) => setReuseKey(e.target.checked)} /> Allow reuse of the effective existing key for this URL</label>}
+			{authMode === "apiKey" && keySource === "env" && <p className="text-[11px] text-muted-foreground" data-testid="custom-env-owned">当前密钥来自环境变量。请修改环境变量来替换它。</p>}
+			{authMode === "apiKey" && keyPresent && (changedTarget || keyReuseRequired) && <label className="text-[11px]"><input type="checkbox" data-testid="custom-reuse-key" checked={reuseKey} onChange={(e) => setReuseKey(e.target.checked)} /> 允许此 URL 复用当前生效的密钥</label>}
 			<div className="flex items-center gap-2">
 				{authMode === "apiKey" && <input
 					type="password"
@@ -934,8 +934,8 @@ function CustomEndpointEditor({
 						setKeyTouched(true);
 						if (!e.target.value.trim()) setAuthMode("keyless");
 					}}
-					placeholder={keyPresent ? "Leave blank to keep effective key" : "API key"}
-					aria-label="Custom endpoint API key"
+					placeholder={keyPresent ? "留空将保留当前生效的密钥" : "API 密钥"}
+					aria-label="自定义端点 API 密钥"
 					data-testid="custom-key-input"
 					disabled={busy || pinsBusy || keySource === "env"}
 					className="h-7 min-w-0 flex-1 rounded-sm border border-border bg-background px-1.5 font-mono text-xs text-foreground outline-none placeholder:text-muted-foreground/60 focus:border-muted-foreground/50"
@@ -947,7 +947,7 @@ function CustomEndpointEditor({
 					data-testid="custom-save"
 					className="shrink-0 text-xs text-foreground underline-offset-2 hover:underline disabled:text-muted-foreground/40 disabled:no-underline"
 				>
-					{busy ? "Connecting…" : "Connect"}
+					{busy ? "正在连接…" : "连接"}
 				</button>
 				<button
 					type="button"
@@ -956,7 +956,7 @@ function CustomEndpointEditor({
 					data-testid="custom-cancel"
 					className="shrink-0 text-xs text-muted-foreground/70 underline-offset-2 hover:text-foreground hover:underline"
 				>
-					Cancel
+					取消
 				</button>
 				{/* Disconnect rides beside Connect, exactly the stored-key rows' Delete:
 				    quiet text, one click, no confirm — and only once there IS an
@@ -969,7 +969,7 @@ function CustomEndpointEditor({
 						data-testid="custom-delete"
 						className="shrink-0 text-xs text-muted-foreground/70 underline-offset-2 hover:text-error hover:underline"
 					>
-						Disconnect
+						断开连接
 					</button>
 				)}
 			</div>
@@ -982,7 +982,7 @@ function CustomEndpointEditor({
 								<div key={m.id} className="flex items-center gap-2" data-testid={pinTestid("custom-pin-row", m.id)}>
 									<span className="min-w-0 flex-1 truncate font-mono text-[11px] text-foreground" title={m.id}>
 										{m.id}
-										<span className="block text-[10px] text-muted-foreground">Context: {d.context.trim() ? "user pin" : m.context ? `reported ${m.context}` : `fallback ${CUSTOM_MODEL_DEFAULT_CONTEXT_WINDOW}`} · Output: {d.maxTokens.trim() ? "user pin" : m.maxTokens ? `reported ${m.maxTokens}` : `fallback ${CUSTOM_MODEL_DEFAULT_MAX_TOKENS}`}</span>
+										<span className="block text-[10px] text-muted-foreground">上下文 {d.context.trim() ? "手动指定" : m.context ? `报告值 ${m.context}` : `默认值 ${CUSTOM_MODEL_DEFAULT_CONTEXT_WINDOW}`} · 输出 {d.maxTokens.trim() ? "手动指定" : m.maxTokens ? `报告值 ${m.maxTokens}` : `默认值 ${CUSTOM_MODEL_DEFAULT_MAX_TOKENS}`}</span>
 									</span>
 									<input
 										type="text"
@@ -990,7 +990,7 @@ function CustomEndpointEditor({
 										value={d.context}
 										onChange={(e) => setDraft(m, { context: e.target.value })}
 										placeholder={String(m.context ?? CUSTOM_MODEL_DEFAULT_CONTEXT_WINDOW)}
-										aria-label={`${m.id} context window in tokens`}
+										aria-label={`${m.id} 的上下文窗口（词元）`}
 										data-testid={pinTestid("custom-pin-context", m.id)}
 										disabled={pinsBusy}
 										className="h-7 w-20 shrink-0 rounded-sm border border-border bg-background px-1.5 text-right font-mono text-[11px] text-foreground outline-none placeholder:text-muted-foreground/60 focus:border-muted-foreground/50"
@@ -1001,7 +1001,7 @@ function CustomEndpointEditor({
 										value={d.maxTokens}
 										onChange={(e) => setDraft(m, { maxTokens: e.target.value })}
 										placeholder={String(m.maxTokens ?? CUSTOM_MODEL_DEFAULT_MAX_TOKENS)}
-										aria-label={`${m.id} max output tokens`}
+										aria-label={`${m.id} 的最大输出词元`}
 										data-testid={pinTestid("custom-pin-maxtokens", m.id)}
 										disabled={pinsBusy}
 										className="h-7 w-20 shrink-0 rounded-sm border border-border bg-background px-1.5 text-right font-mono text-[11px] text-foreground outline-none placeholder:text-muted-foreground/60 focus:border-muted-foreground/50"
@@ -1009,14 +1009,14 @@ function CustomEndpointEditor({
 									<select
 										value={d.reasoning}
 										onChange={(e) => setDraft(m, { reasoning: e.target.value as PinDraft["reasoning"] })}
-										aria-label={`${m.id} reasoning effort support`}
+										aria-label={`${m.id} 的推理档位支持`}
 										data-testid={pinTestid("custom-pin-reasoning", m.id)}
 										disabled={pinsBusy}
 										className="h-7 shrink-0 rounded-sm border border-border bg-background px-1 font-ui text-[11px] text-foreground outline-none focus:border-muted-foreground/50"
 									>
-										<option value="">Reasoning effort: Use reported</option>
-										<option value="on">Reasoning effort: Supported</option>
-										<option value="off">Reasoning effort: Not supported</option>
+										<option value="">推理档位：采用报告值</option>
+										<option value="on">推理档位：支持</option>
+										<option value="off">推理档位：不支持</option>
 									</select>
 								</div>
 							);
@@ -1035,16 +1035,16 @@ function CustomEndpointEditor({
 							data-testid="custom-pins-save"
 							className="ml-auto shrink-0 text-xs text-foreground underline-offset-2 hover:underline disabled:text-muted-foreground/40 disabled:no-underline"
 						>
-							{pinsBusy ? "Saving…" : "Save limits"}
+							{pinsBusy ? "正在保存…" : "保存限制"}
 						</button>
 					</div>
 				</div>
 			)}
 			<div className="flex flex-col gap-1 text-[11px] text-muted-foreground" data-testid="custom-help">
-				{!setup && models.length > 0 && <p data-testid="custom-budget-help">Budget pins do not resize backend context. Blank uses reported limits, then fallback (8192 context / 4096 output). Custom pricing is unknown.</p>}
-				<p data-testid="custom-reasoning-help">Reasoning support is a capability declaration. The effort picker’s Off may not disable a custom backend’s default thinking.</p>
+				{!setup && models.length > 0 && <p data-testid="custom-budget-help">预算设置只影响本地估算。留空时优先使用服务端报告值，否则使用默认值（上下文 8192，输出 4096）。自定义模型价格未知。</p>}
+				<p data-testid="custom-reasoning-help">此设置用于声明推理能力。选择「关闭」时，自定义后端仍可能使用默认推理。</p>
 			</div>
-			{(error || pinsError) && <button type="button" data-testid="custom-reload" onClick={() => void onReload()} className="text-left text-xs underline">Reload configuration</button>}
+			{(error || pinsError) && <button type="button" data-testid="custom-reload" onClick={() => void onReload()} className="text-left text-xs underline">重新加载配置</button>}
 			{error && (
 				<p role="alert" data-testid="custom-error" className="text-xs text-error">
 					{error}

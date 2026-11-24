@@ -30,12 +30,12 @@ export function mountTestResult(container: HTMLElement, ui: Pick<PluginFrontendC
   signal.addEventListener("abort", dispose, { once: true });
   try {
     badge = ui.mountBadge(badgeRoot, {
-      text: result.status === "passed" ? "Tests passed" : result.status === "failed" ? "Tests failed" : "Could not run tests",
+      text: result.status === "passed" ? "测试通过" : result.status === "failed" ? "测试失败" : "无法运行测试",
       ...(result.status === "passed" ? { color: "var(--color-green-500, #22c55e)" } : result.status === "failed" ? { color: "var(--color-red-500, #ef4444)" } : {}),
     }, { signal });
     if (disposed) { badge.dispose(); return dispose; }
     if (result.stdout !== "" || result.stderr !== "" || result.message || result.stdoutTruncated || result.stderrTruncated) {
-      outputCleanup = mountDisclosure(root, "test-output", "Test output", signal, body => {
+      outputCleanup = mountDisclosure(root, "test-output", "测试输出", signal, body => {
         if (result.message) {
           const message = document.createElement("p");
           message.textContent = result.message;
@@ -55,7 +55,7 @@ export function mountTestResult(container: HTMLElement, ui: Pick<PluginFrontendC
           }
           if (truncated) {
             const notice = document.createElement("p");
-            notice.textContent = `${label} truncated at 64 KiB.`;
+            notice.textContent = `${label} 已截断为 64 KiB。`;
             body.append(notice);
           }
         }

@@ -18,7 +18,7 @@ export const practiceInstructions = "When a practice problem calls for writing o
 
 export const definition = {
   id: QUESTION_TYPE_ID,
-  label: "Coding question",
+  label: "编程题",
   contractVersion: 1,
   showThinking: true,
   questionSchema: {
@@ -62,7 +62,7 @@ export const definition = {
 
 export const problemDefinition = {
   id: PROBLEM_TYPE_ID,
-  label: "Coding problem",
+  label: "编程练习",
   contractVersion: 1,
   tool: {
     toolName: "coding_problem",

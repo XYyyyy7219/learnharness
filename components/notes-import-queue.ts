@@ -8,7 +8,7 @@ const hiddenInFolder = (file: File): boolean => file.webkitRelativePath.split("/
 /** From the last dot of the file name, lower-cased. A dot that starts the name (".DS_Store") or ends it ("notes.") is not an extension. */
 const extensionLabel = (name: string): string => {
 	const dot = name.lastIndexOf(".");
-	return dot > 0 && dot < name.length - 1 ? name.slice(dot).toLowerCase() : "no extension";
+	return dot > 0 && dot < name.length - 1 ? name.slice(dot).toLowerCase() : "无扩展名";
 };
 /** One line per reason for a whole pick, so a big folder cannot flood the error list. */
 const unsupportedSummary = (extensions: readonly string[]): string =>

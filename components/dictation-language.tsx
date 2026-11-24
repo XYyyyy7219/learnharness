@@ -15,7 +15,7 @@ type LanguagePreference = ReturnType<typeof useDictationLanguage>;
 export function DictationLanguageSetting() {
 	const preference = useDictationLanguage();
 	const active = useDictationActive();
-	return <SettingsRow label="Language" testid="row-dictation-language" dimmed={active}>
+	return <SettingsRow label="语言" testid="row-dictation-language" dimmed={active}>
 		<DictationLanguagePicker preference={preference} disabled={active} />
 	</SettingsRow>;
 }
@@ -52,12 +52,12 @@ function DictationLanguagePicker({ preference, disabled }: {
 	};
 
 	return <>
-		<Hint label={error ?? `Dictation language: ${label}`} side="top">
+		<Hint label={error ?? `听写语言 ${label}`} side="top">
 			<SettingsMenuTrigger
 				ref={triggerRef}
 				value={label}
 				data-testid="dictation-language"
-				aria-label={`Dictation language: ${label}`}
+				aria-label={`听写语言 ${label}`}
 				aria-expanded={open && !disabled}
 				disabled={disabled || saving}
 				onClick={() => {
@@ -93,8 +93,8 @@ function DictationLanguagePicker({ preference, disabled }: {
 					searchTestid="dictation-language-search"
 					listTestid="dictation-language-list"
 					optionTestid={(item) => `dictation-language-${item.code}`}
-					ariaLabel="Search dictation languages"
-					placeholder="Search languages…"
+					ariaLabel="搜索听写语言"
+					placeholder="搜索语言…"
 					empty="No languages match."
 					renderItem={(item) => <span className="text-card-foreground">{item.label}</span>}
 				/>

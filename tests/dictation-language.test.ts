@@ -20,7 +20,7 @@ describe("Nova-3 dictation language contract", () => {
 			assert.equal(isDictationLanguage(code), false, String(code));
 		}
 		const labels = DICTATION_LANGUAGES.slice(1).map((item) => item.label);
-		assert.deepEqual(labels, [...labels].sort((a, b) => a.localeCompare(b, "en")));
+		assert.deepEqual(labels, [...labels].sort((a, b) => a.localeCompare(b, "zh-CN")));
 	});
 
 	it("only language varies in the streaming URL; all tuned parameters survive", () => {

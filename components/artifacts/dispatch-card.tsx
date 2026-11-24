@@ -100,7 +100,7 @@ function DispatchActivityCard({ job, label }: { job: JobRecord | null; label: st
 				    the Braille spinner replaces the pulsing dot — one indicator
 				    everywhere. This is the ONLY dispatch-card change; the card's
 				    shape is untouched. */}
-				<BrailleSpinner label={`${label} running`} />
+				<BrailleSpinner label={`${label} 个正在运行`} />
 				{label}
 				{elapsed !== null && <span className="font-normal">· {elapsed}s</span>}
 			</div>
@@ -111,7 +111,7 @@ function DispatchActivityCard({ job, label }: { job: JobRecord | null; label: st
 			)}
 			{!job && (
 				<div className="mt-1 text-sm text-muted-foreground" data-testid="dispatch-pending">
-					Dispatched…
+					已派发…
 				</div>
 			)}
 		</div>

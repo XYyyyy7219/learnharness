@@ -378,7 +378,7 @@ export class SessionModel {
 		const providerError =
 			latest !== undefined &&
 			!this.incompleteUsageIds.has(latest.id) && (!live || latest.id === this.liveFailureId)
-				? { message: latest.errorMessage ?? "An error occurred." }
+				? { message: latest.errorMessage ?? "发生错误。" }
 				: null;
 		return {
 			messages: projectView(messages, live),
@@ -1098,7 +1098,7 @@ export class SessionModel {
 			}
 			dropSteer();
 			settleDelivery();
-			this.setError((await res.text()) || `The steer failed (${res.status}).`);
+			this.setError((await res.text()) || `无法发送引导消息（${res.status}）。`);
 		} catch (err) {
 			dropSteer(); settleDelivery();
 			this.setError((err as Error).message);

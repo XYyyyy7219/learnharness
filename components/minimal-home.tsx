@@ -61,20 +61,20 @@ export function KnowledgeSummary({
 			<div className="h-4" aria-hidden="true" />
 			<div className="flex flex-col gap-1">
 				<p className="font-ui text-sm text-muted-foreground">
-					{teachSessions} {teachSessions === 1 ? "teaching session" : "teaching sessions"}
+					{teachSessions} {teachSessions === 1 ? "教学会话" : "教学会话"}
 				</p>
 				<p className="font-ui text-sm text-muted-foreground">
-					{practiceSessions} {practiceSessions === 1 ? "practice session" : "practice sessions"}
+					{practiceSessions} {practiceSessions === 1 ? "练习会话" : "练习会话"}
 				</p>
 			</div>
 			<div className="h-4" aria-hidden="true" />
 			<p className="font-ui text-sm text-muted-foreground">
-				{importedNotes} {importedNotes === 1 ? "imported note" : "imported notes"}
+				{importedNotes} {importedNotes === 1 ? "导入笔记" : "导入笔记"}
 			</p>
 			{empty && (
 				<div className="pt-2 font-ui text-xs text-muted-foreground/70">
-					<p>Start a session to begin learning.</p>
-					<p className="mt-1">Attach your material with the paperclip or drag and drop.</p>
+					<p>创建会话，开始学习。</p>
+					<p className="mt-1">可点击回形针或拖放文件来添加学习资料。</p>
 				</div>
 			)}
 		</div>
@@ -157,7 +157,7 @@ export function MinimalHome({
 			<div className="lh-no-drag lh-wco-floating absolute right-2 top-2 z-10 flex max-w-[calc(100%-5.5rem)] flex-col items-end gap-2">
 				<div className="flex min-w-0 items-start gap-2">
 					<div className="graph-chrome-fade-in shrink-0 rounded-xl border bg-card/85 px-1 py-[3px] shadow-lg backdrop-blur">
-						<Hint label="Every reasoning chain" side="bottom">
+						<Hint label="所有推理链" side="bottom">
 							<button
 								type="button"
 								onClick={() => setChainsOpen(true)}
@@ -165,7 +165,7 @@ export function MinimalHome({
 								className="flex h-7 items-center gap-1.5 rounded-lg px-2.5 text-xs text-muted-foreground transition-colors hover:bg-accent"
 							>
 								<ListTreeIcon className="size-3" />
-								Chains
+								推理链
 							</button>
 						</Hint>
 					</div>

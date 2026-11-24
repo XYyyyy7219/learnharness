@@ -27,13 +27,13 @@ function dateLabels(day) {
 }
 
 export function mountDashboard({ container, signal }) {
-  const root = element('section', 'fc-dashboard'); root.setAttribute('aria-label', 'Spaced repetition');
-  const heading = element('h2', 'fc-dashboard-heading', 'Spaced repetition');
-  const loading = element('p', 'fc-muted', 'Loading statistics…'); loading.setAttribute('role', 'status');
-  const stateTitle = element('h3', '', 'Current states');
+  const root = element('section', 'fc-dashboard'); root.setAttribute('aria-label', "间隔重复");
+  const heading = element('h2', 'fc-dashboard-heading', "间隔重复");
+  const loading = element('p', 'fc-muted', "正在加载统计…"); loading.setAttribute('role', 'status');
+  const stateTitle = element('h3', '', "当前状态");
   const stateBar = element('div', 'fc-state-bar'); stateBar.setAttribute('aria-hidden', 'true');
   const legend = element('ul', 'fc-state-legend');
-  const stateCaption = element('p', 'fc-chart-caption', 'Active propositions with at least one cue.');
+  const stateCaption = element('p', 'fc-chart-caption', "至少有一条线索的活跃命题。");
   const charts = element('div', 'fc-chart-grid');
   root.append(heading, loading, stateTitle, stateBar, legend, stateCaption, charts);
   const stateNodes = states.map(([key, label]) => {
@@ -51,8 +51,8 @@ export function mountDashboard({ container, signal }) {
     scroll.append(svg); figure.append(chartTitle, scroll, element('figcaption', 'fc-chart-caption', caption)); charts.append(figure);
     return { title, svg };
   }
-  const due = chart('due', 'Scheduled due', 'Current scheduled due dates.');
-  const activity = chart('activity', 'Scheduled reviews', 'Scheduled review ratings recorded each day.');
+  const due = chart('due', "到期分布", "目前已安排的到期日期。");
+  const activity = chart('activity', "定期复习", "每天记录的定期复习评分。");
   let disposed = false;
   function renderChart(chart, values, kind, width) {
     const rows = Array.isArray(values) ? values : [];

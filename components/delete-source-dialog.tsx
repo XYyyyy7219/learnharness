@@ -11,25 +11,25 @@ export function DeleteSourceBody({ sources, folders, deleteSessions, onDeleteSes
 }) {
 	const chats = sources.filter((s) => s.kind === "chat");
 	const names = [...sources.map((s) => s.label ?? s.id), ...folders.map((f) => f.name)];
-	const frame = <div role="dialog" aria-modal="true" aria-label="Delete sources" data-testid="delete-source-dialog"
+	const frame = <div role="dialog" aria-modal="true" aria-label="删除来源" data-testid="delete-source-dialog"
 		onClick={(e) => e.stopPropagation()} className="w-[32rem] max-w-[calc(100vw-2rem)] rounded-xl border bg-card p-5 shadow-xl">
-		<h2 className="text-sm font-semibold text-destructive">Delete selected sources and folders?</h2>
-		<p className="mt-1.5 font-mono text-sm" data-testid="source-deletion-names">{names.slice(0, 8).join(", ")}{names.length > 8 ? `, and ${names.length - 8} more` : ""}</p>
+		<h2 className="text-sm font-semibold text-destructive">删除所选来源和文件夹？</h2>
+		<p className="mt-1.5 font-mono text-sm" data-testid="source-deletion-names">{names.slice(0, 8).join(", ")}{names.length > 8 ? `，另有 ${names.length - 8} 项` : ""}</p>
 		{sources.length > 0 && <p className="mt-2 text-sm text-muted-foreground" data-testid="source-deletion-contributions">
-			Removes these sources’ contributions to propositions and reasoning chains. Knowledge supported by other sources survives; knowledge supported only by these sources is removed.
+			清除这些来源对命题和推理链的贡献。其他来源也支持的知识会保留，仅由这些来源支持的知识将被移除。
 		</p>}
-		<p className="mt-2 text-xs text-muted-foreground">Imported source records are removed, but original files on disk are never changed. Selected folders are removed only when empty; folders needed by kept sessions remain.</p>
+		<p className="mt-2 text-xs text-muted-foreground">将移除导入来源的记录，但保留磁盘原文件。只移除所选的空文件夹，保留仍有会话使用的文件夹。</p>
 		{chats.length > 0 && <label className="mt-4 flex cursor-pointer items-start gap-2.5 rounded-lg border border-border/60 px-4 py-3">
 			<input type="checkbox" data-testid="delete-source-sessions" checked={deleteSessions} disabled={busy}
 				onChange={(e) => onDeleteSessions(e.target.checked)} className="mt-0.5 size-4 shrink-0 accent-primary" />
-			<span className="min-w-0"><span className="block text-sm">Also delete the {chats.length} selected {chats.length === 1 ? "session" : "sessions"}</span>
-				<span className="mt-1 block text-xs text-muted-foreground">Unchecked, conversations stay in their current folders and can be extracted again. Either way, their graph contributions and extraction coverage are cleared. Checking this also permanently deletes their messages and background jobs.</span>
+			<span className="min-w-0"><span className="block text-sm">同时删除 {chats.length} selected {chats.length === 1 ? "session" : "sessions"}</span>
+				<span className="mt-1 block text-xs text-muted-foreground">未勾选时，会话会保留在原文件夹中，之后仍可提取。无论是否勾选，都将清除对应的图谱贡献和提取进度。勾选后还会永久删除消息与后台任务。</span>
 			</span>
 		</label>}
 		{failure && <p role="alert" data-testid="source-delete-failure" className="mt-3 text-xs text-foreground">{failure}</p>}
 		<div className="mt-4 flex justify-end gap-2">
-			<button type="button" data-testid="source-delete-cancel" disabled={busy} onClick={onClose} className="rounded-sm px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40">Cancel</button>
-			<button type="button" data-testid="source-delete-confirm" disabled={busy} onClick={onRun} className="rounded-sm border border-destructive/50 bg-destructive/10 px-3 py-1.5 text-xs text-destructive transition-colors hover:bg-destructive/20 disabled:opacity-40">{busy ? "Deleting…" : failure ? "Try again" : "Delete"}</button>
+			<button type="button" data-testid="source-delete-cancel" disabled={busy} onClick={onClose} className="rounded-sm px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40">取消</button>
+			<button type="button" data-testid="source-delete-confirm" disabled={busy} onClick={onRun} className="rounded-sm border border-destructive/50 bg-destructive/10 px-3 py-1.5 text-xs text-destructive transition-colors hover:bg-destructive/20 disabled:opacity-40">{busy ? "正在删除…" : failure ? "重试" : "删除"}</button>
 		</div>
 	</div>;
 	return renderFrame ? renderFrame(frame) : frame;

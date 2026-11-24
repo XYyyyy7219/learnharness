@@ -107,7 +107,7 @@
 	   (Source Sans 3 by default). The loading-face variables attach in
 	   app/layout.tsx. Keep the sans alias pointed at the RUNTIME prose token,
 	   not the loading face, so font-sans also honors Appearance changes. */
-	--font-ui: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
+	--font-ui: var(--font-jetbrains), "Microsoft YaHei UI", "PingFang SC", ui-monospace, SFMono-Regular, monospace;
 	--font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
 	--font-sans: var(--font-prose);
 	/* The modular type ladder — each size carries its own line-height.
@@ -685,7 +685,7 @@ body {
    independently, whether titles use serif or the reading family. Non-inline
    utilities read these vars; Source Sans 3 remains the default/loading face. */
 @theme {
-	--font-prose: var(--font-sans3), ui-sans-serif, system-ui, sans-serif;
+	--font-prose: var(--font-sans3), "Microsoft YaHei UI", "PingFang SC", ui-sans-serif, system-ui, sans-serif;
 	--font-title: "lh-cmu", serif;
 }
 

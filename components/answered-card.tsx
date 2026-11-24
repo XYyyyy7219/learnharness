@@ -126,7 +126,7 @@ export function AnsweredCard({ answer: savedAnswer, input, toolCallId }: { answe
 	if (answer.dismissed) {
 		return (
 			<div className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
-				<span className="font-medium">{answer.questionText}</span> — skipped
+				<span className="font-medium">{answer.questionText}</span> · 已跳过
 			</div>
 		);
 	}
@@ -282,7 +282,7 @@ export function AnsweredCard({ answer: savedAnswer, input, toolCallId }: { answe
 				</div>
 			)}
 			{answer.dontKnow && isQuiz && (
-				<div className="mt-2 text-sm text-muted-foreground">Answered “I don't know”.</div>
+				<div className="mt-2 text-sm text-muted-foreground">回答了「我不知道」。</div>
 			)}
 			</div>
 			</div>
@@ -315,11 +315,11 @@ export function AnsweredCard({ answer: savedAnswer, input, toolCallId }: { answe
 						onClick={() => setWhyOpen((v) => !v)}
 						className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
 					>
-						{whyOpen ? "Hide why" : "Why"}
+						{whyOpen ? "隐藏解释" : "原因"}
 					</button>
 					{whyOpen && (
 						<div className="mt-1.5 rounded-lg bg-muted py-2 text-sm text-foreground/50">
-							<span className="font-medium text-muted-foreground">Why: </span>
+							<span className="font-medium text-muted-foreground">原因 </span>
 							{/* Keep the first paragraph beside the label, not every paragraph:
 							   later paragraphs must retain their recovered document structure. */}
 							<ToolContentResponse className="inline [&>p:first-child]:inline [&>p:first-child]:m-0">{answer.explanation}</ToolContentResponse>
@@ -333,7 +333,7 @@ export function AnsweredCard({ answer: savedAnswer, input, toolCallId }: { answe
 			    the model's next reply IS the grading. */}
 			{isExplain && answer.committed && (
 				<div className="mt-3 rounded-lg bg-muted py-2 text-sm text-muted-foreground">
-					<span className="font-medium text-foreground">The answer: </span>
+					<span className="font-medium text-foreground">答案 </span>
 					<ToolContentResponse className="inline [&>p:first-child]:inline [&>p:first-child]:m-0">{answer.committed}</ToolContentResponse>
 				</div>
 			)}

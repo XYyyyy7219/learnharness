@@ -43,7 +43,7 @@ export function SubagentSteerCard({ message }: { message: LhViewMessage }) {
 		// learner aborts and do not invent an outcome for an unreadable task.
 		if (typeof aborted?.data?.failure === "string") return (
 			<div data-testid="job-delivery-failure" role="alert" className="space-y-1 rounded-xl border bg-card p-4 text-sm">
-				<p className="font-medium">Background job recovery/delivery failed</p>
+				<p className="font-medium">后台任务恢复或交付失败</p>
 				<p className="whitespace-pre-wrap break-words text-muted-foreground">{aborted.data.failure}</p>
 			</div>
 		);
@@ -86,7 +86,7 @@ function AbortedBadge({ kind }: { kind: string }) {
 		<div data-testid="job-aborted-badge" className="flex items-center gap-2 text-xs text-muted-foreground">
 			<CircleX className="size-3.5" />
 			<span className="font-medium uppercase tracking-wide">{kind}</span>
-			<span>aborted by the learner</span>
+			<span>已由学习者中止</span>
 		</div>
 	);
 }
@@ -102,10 +102,10 @@ function PdfCompleteBadge({ result }: { result: PdfResult }) {
 	return (
 		<WorkerResultDetails testId="pdf-complete-badge" heading={<>
 				<span className="font-medium uppercase tracking-wide">PDF</span>
-				<span>reading complete</span>
+				<span>阅读完成</span>
 				{readPages.length > 0 && (
 					<span>
-						· read {readPages.length} page{readPages.length === 1 ? "" : "s"}
+						· 已读 {readPages.length} page{readPages.length === 1 ? "" : "s"}
 					</span>
 				)}
 			</>}>
@@ -122,7 +122,7 @@ function PdfCompleteBadge({ result }: { result: PdfResult }) {
 function ResearchCompleteBadge({ result }: { result: ResearchResult }) {
 	return (
 		<WorkerResultDetails testId="research-complete-badge" heading={<>
-				<span className="font-medium uppercase tracking-wide">Research</span>
+				<span className="font-medium uppercase tracking-wide">研究</span>
 				<span>complete</span>
 				{result.sources.length > 0 && <span>· {result.sources.length} sources</span>}
 			</>}>

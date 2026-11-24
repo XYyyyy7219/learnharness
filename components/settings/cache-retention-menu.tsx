@@ -3,14 +3,14 @@
 import type { CacheRetention } from "@earendil-works/pi-ai";
 
 const OPTIONS = [
-	{ value: undefined, compact: "default", label: "Pi default", description: "Leave the option unset. Pi’s normal behavior and environment override apply." },
-	{ value: "none", compact: "not requested", label: "Don’t request caching", description: "Pass Pi’s native none preference. Providers may still cache automatically." },
-	{ value: "short", compact: "short", label: "Short retention", description: "Pass Pi’s native short preference. The duration depends on the provider and model." },
-	{ value: "long", compact: "long", label: "Long retention", description: "Pass Pi’s native long preference. Cache-write costs may be higher." },
+	{ value: undefined, compact: "默认", label: "Pi 默认值", description: "保持未设置，使用 Pi 默认行为或环境变量中的设置。" },
+	{ value: "none", compact: "不请求", label: "不主动请求缓存", description: "使用 Pi 的 none 选项。服务商仍可能自动缓存。" },
+	{ value: "short", compact: "短期", label: "短期保留", description: "使用 Pi 的 short 选项。实际时长取决于服务商与模型。" },
+	{ value: "long", compact: "长期", label: "长期保留", description: "使用 Pi 的 long 选项。缓存写入费用可能较高。" },
 ] as const;
 
 export function cacheRetentionLabel(value: CacheRetention | undefined): string {
-	return `Cache: ${OPTIONS.find((option) => option.value === value)!.compact}`;
+	return `缓存：${OPTIONS.find((option) => option.value === value)!.compact}`;
 }
 
 export function CacheRetentionMenu({ value, onPick }: {
@@ -19,8 +19,8 @@ export function CacheRetentionMenu({ value, onPick }: {
 }) {
 	return <>
 		<div className="border-b border-border px-2 pb-2">
-			<p className="text-card-foreground">Cache retention</p>
-			<p className="mt-1 text-muted-foreground">Controls the cache-retention preference sent to Pi. Support and duration depend on the provider and model. This does not guarantee a cache hit.</p>
+			<p className="text-card-foreground">缓存保留时间</p>
+			<p className="mt-1 text-muted-foreground">设置发送给 Pi 的缓存保留偏好。支持情况和时长取决于服务商与模型，实际缓存命中由服务商决定。</p>
 		</div>
 		{OPTIONS.map((option) => <button
 			key={option.value ?? "default"}

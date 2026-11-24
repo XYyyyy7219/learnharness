@@ -110,15 +110,15 @@ export function NotesImportControl({ importing, onImportFiles }: { importing: bo
 			onBlur={(event) => { if (interactions.isElementEligible(panelRef.current) && !event.currentTarget.contains(event.relatedTarget)) setOpen(false); }}>
 			<input ref={filesRef} type="file" multiple accept={IMPORT_ACCEPT} className="hidden" onChange={onChange} />
 			<input ref={folderRef} type="file" {...{ webkitdirectory: "" }} className="hidden" onChange={onChange} />
-			<Hint label="Extract files into the graph" side="bottom">
+			<Hint label="将文件提取到知识图谱" side="bottom">
 				<button type="button" onClick={() => setOpen(!open)} aria-expanded={open} aria-haspopup="menu" data-testid="import-notes"
 					className="flex h-7 items-center gap-1.5 rounded-lg px-2.5 text-xs text-muted-foreground transition-colors hover:bg-accent">
-					<WaypointsIcon className="size-3" />{importing ? "Extracting…" : "Extract files…"}
+					<WaypointsIcon className="size-3" />{importing ? "正在提取…" : "提取文件…"}
 				</button>
 			</Hint>
 			{open && (
-				<div ref={panelRef} role="menu" aria-label="Extract files into the graph" aria-describedby={hintId} style={{ zIndex: INTERACTION_LAYER_Z_BASE + popupLayer.order }} className="absolute right-0 top-full mt-1 w-52 rounded-lg border bg-card p-1 shadow-lg">
-					<div role="none"><p id={hintId} className="px-2 py-1.5 text-xs leading-relaxed text-muted-foreground">For lessons, attach material to a session instead.</p></div>
+				<div ref={panelRef} role="menu" aria-label="将文件提取到知识图谱" aria-describedby={hintId} style={{ zIndex: INTERACTION_LAYER_Z_BASE + popupLayer.order }} className="absolute right-0 top-full mt-1 w-52 rounded-lg border bg-card p-1 shadow-lg">
+					<div role="none"><p id={hintId} className="px-2 py-1.5 text-xs leading-relaxed text-muted-foreground">如需用于教学，请将资料添加到会话中。</p></div>
 					{choices.map(([label, input]) => <button key={label} type="button" role="menuitem" className="block w-full rounded px-2 py-1 text-left text-xs hover:bg-accent"
 						onClick={() => { setOpen(false); input.current?.click(); }}>{label}</button>)}
 				</div>
