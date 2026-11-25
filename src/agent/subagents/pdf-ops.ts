@@ -46,13 +46,14 @@ async function loadPdfjs() {
 	return pdfjs;
 }
 
-/** Standard-font data dir (live-smoke finding 2026-09-19: without it pdfjs
- *  warns and falls back on non-embedded standard fonts — Helvetica, Times…).
- *  The node side takes a plain filesystem path, shared by text and rendering.
- *  pdfjs checks endsWith("/") even on Windows: use a literal trailing slash,
- *  NOT path.sep ("\\" on Windows). Node fs accepts this path on every OS. */
+/** PDF.js on Node reads assets from disk and requires a literal trailing
+ * slash, including on Windows. The standalone build traces these directories. */
+function pdfAssetDir(directory: "standard_fonts" | "wasm"): string {
+	return path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "node_modules", "pdfjs-dist", directory) + "/";
+}
+
 export function standardFontsDir(): string {
-	return path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "node_modules", "pdfjs-dist", "standard_fonts") + "/";
+	return pdfAssetDir("standard_fonts");
 }
 
 async function openDocument(filePath: string) {
@@ -66,11 +67,13 @@ async function loadBytes(data: Uint8Array, signal?: AbortSignal): Promise<PdfLoa
 	signal?.throwIfAborted();
 	const pdfjs = await loadPdfjs();
 	signal?.throwIfAborted();
-	// The legacy build in plain node runs on a main-thread fake worker (no
-	// workerSrc needed); teardown is the loading task's destroy().
-	// verbosity 0 = errors only — scanned PDFs (JBIG2 XObjects) otherwise
-	// flood the log with per-page warnings (live-smoke finding 2026-09-19).
-	return pdfjs.getDocument({ data, standardFontDataUrl: standardFontsDir(), verbosity: 0 });
+	// Scanned pages can rely on the local CCITT/JBIG2 or JPEG 2000 decoder.
+	return pdfjs.getDocument({
+		data,
+		standardFontDataUrl: standardFontsDir(),
+		wasmUrl: pdfAssetDir("wasm"),
+		verbosity: 0,
+	});
 }
 
 /** Open caller-owned bytes (pdfjs may transfer them). The caller owns task destruction. */

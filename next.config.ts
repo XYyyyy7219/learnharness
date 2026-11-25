@@ -65,7 +65,7 @@ const nextConfig: NextConfig = {
 	// the server 500s on module load. Include the whole data dirs of the
 	// runtime-loaded engine packages.
 	// pdfjs-dist (sources v0 live smoke, 2026-09-19): its legacy build loads
-	// the node fake worker (pdf.worker.mjs) and our standard_fonts dir via
+	// the node fake worker, standard fonts, and WASM image decoders via
 	// runtime-resolved paths — invisible to the tracer. Bundling (without
 	// serverExternalPackages below) additionally breaks the worker's
 	// import.meta.url resolution inside .next/dev chunks — the live smoke
@@ -77,6 +77,7 @@ const nextConfig: NextConfig = {
 			"node_modules/@puppeteer/browsers/lib/browser-data/**/*.js",
 			"node_modules/pdfjs-dist/legacy/**/*",
 			"node_modules/pdfjs-dist/standard_fonts/**/*",
+			"node_modules/pdfjs-dist/wasm/**/*",
 			// Wave E (2026-10-10): pdf_render paints via @napi-rs/canvas — its
 			// platform binary (@napi-rs/canvas-<platform>-<arch>) is a dynamic
 			// optional-dep require the tracer cannot see. Builds run per-OS and

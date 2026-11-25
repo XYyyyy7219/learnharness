@@ -11,6 +11,7 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import { describe, it } from "node:test";
+import { createCanvas, loadImage } from "@napi-rs/canvas";
 import { MAX_PDF_CANVAS_PIXELS, MAX_PDF_CANVAS_SIDE, pdfCanvasGeometry, realHeadless } from "../src/agent/subagents/headless.ts";
 import { standardFontsDir } from "../src/agent/subagents/pdf-ops.ts";
 
@@ -41,6 +42,10 @@ function oversizedPdf(): Buffer {
 		"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 20000 10000] /Rotate 90 /Resources << >> /Contents 4 0 R >>",
 		`<< /Length ${Buffer.byteLength(content)} >>\nstream\n${content}endstream`,
 	];
+	return testPdf(objects);
+}
+
+function testPdf(objects: string[]): Buffer {
 	let pdf = "%PDF-1.7\n";
 	const offsets = [0];
 	for (const [index, object] of objects.entries()) {
@@ -52,6 +57,23 @@ function oversizedPdf(): Buffer {
 	for (const offset of offsets.slice(1)) pdf += `${String(offset).padStart(10, "0")} 00000 n \n`;
 	pdf += `trailer\n<< /Size ${offsets.length} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`;
 	return Buffer.from(pdf);
+}
+
+/** A single 8×8 black image encoded as CCITT Group 4. */
+function faxScanPdf(): Buffer {
+	// Horizontal mode, white run of length zero, black run of length eight.
+	const row = "001" + "00110101" + "000101";
+	const bits = row.repeat(8) + "000000000001".repeat(2);
+	const hex = bits.padEnd(Math.ceil(bits.length / 8) * 8, "0")
+		.match(/.{8}/g)!.map((byte) => Number.parseInt(byte, 2).toString(16).padStart(2, "0")).join("") + ">";
+	const paint = "q 8 0 0 8 4 4 cm /Scan Do Q\n";
+	return testPdf([
+		"<< /Type /Catalog /Pages 2 0 R >>",
+		"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+		"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 16 16] /Resources << /XObject << /Scan 5 0 R >> >> /Contents 4 0 R >>",
+		`<< /Length ${paint.length} >>\nstream\n${paint}endstream`,
+		`<< /Type /XObject /Subtype /Image /Width 8 /Height 8 /ColorSpace /DeviceGray /BitsPerComponent 1 /Filter [/ASCIIHexDecode /CCITTFaxDecode] /DecodeParms [null << /K -1 /Columns 8 /Rows 8 >>] /Length ${hex.length} >>\nstream\n${hex}\nendstream`,
+	]);
 }
 
 describe("PDF pre-allocation canvas geometry", () => {
@@ -128,6 +150,23 @@ describe("native pdf_render (pdfjs paints, @napi-rs/canvas hosts)", () => {
 			assert.ok(facts.w > 0 && facts.h > 0, "non-empty raster");
 			// providerSafePng canonical form: exactly one IDAT.
 			assert.equal(facts.idats, 1, "single-IDAT canonical PNG");
+		}
+	});
+
+	it("renders the CCITT image on a scanned page with no text layer", async () => {
+		const dir = fs.mkdtempSync(path.join(os.tmpdir(), "learnharness-fax-"));
+		try {
+			const file = path.join(dir, "scan.pdf");
+			fs.writeFileSync(file, faxScanPdf());
+			const [page] = await realHeadless.renderPdfPages(file, [1], { dpi: 72 });
+			assert.ok(page);
+			const image = await loadImage(page.png);
+			const context = createCanvas(image.width, image.height).getContext("2d");
+			context.drawImage(image, 0, 0);
+			assert.deepEqual([...context.getImageData(0, 0, 1, 1).data], [255, 255, 255, 255]);
+			assert.deepEqual([...context.getImageData(8, 8, 1, 1).data], [0, 0, 0, 255]);
+		} finally {
+			fs.rmSync(dir, { recursive: true, force: true });
 		}
 	});
 
